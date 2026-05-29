@@ -1,0 +1,41 @@
+site_name: تدبر القرآن — مشروع فجر
+docs_dir: surahs
+site_dir: site
+
+theme:
+  name: material
+  language: ar          # يفعّل اتجاه RTL تلقائيًا للعربية
+  direction: rtl
+  features:
+    - navigation.top
+    - navigation.instant
+    - navigation.tracking
+    - search.suggest
+    - search.highlight
+    - toc.follow
+    - content.code.copy
+  palette:
+    - scheme: default
+      primary: teal
+      accent: teal
+      toggle:
+        icon: material/weather-night
+        name: الوضع الليلي
+    - scheme: slate
+      primary: teal
+      accent: teal
+      toggle:
+        icon: material/weather-sunny
+        name: الوضع النهاري
+
+markdown_extensions:
+  - toc:
+      permalink: true
+  - admonition
+  - tables
+  - attr_list
+
+plugins:
+  - search:
+      lang: ar
+  - awesome-pages   # يبني القائمة الجانبية من بنية المجلدات وملفات .pages

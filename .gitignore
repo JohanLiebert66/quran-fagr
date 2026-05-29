@@ -1,0 +1,7 @@
+.env
+site/
+_combined.md
+fagr.docx
+__pycache__/
+*.pyc
+.ipynb_checkpoints/

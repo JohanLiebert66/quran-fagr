@@ -1,0 +1,10 @@
+name: quran-fagr
+channels:
+  - conda-forge
+dependencies:
+  - python=3.12
+  - pandoc          # لتحويل الـ Markdown إلى docx لرفعه على Google Drive
+  - gh              # GitHub CLI — لإنشاء المستودع ونشر الموقع على GitHub Pages
+  - pip
+  - pip:
+      - -r scripts/requirements.txt
