@@ -38,4 +38,5 @@ markdown_extensions:
 plugins:
   - search:
       lang: ar
+  - tags            # فهرس الوسوم يُدرَج في صفحة tags.md عبر العلامة <!-- material/tags -->
   - awesome-pages   # يبني القائمة الجانبية من بنية المجلدات وملفات .pages

@@ -47,3 +47,22 @@ subsection page — dynamic categories, self-maintaining nav. This realizes the 
 Site is a static folder. Plan: GitHub Pages via `mkdocs gh-deploy` for a permanent free
 public URL; `mkdocs serve -a 0.0.0.0` for same-Wi-Fi sharing during the circle; Cloudflare
 Tunnel for an instant temporary public link. Public-internet tradeoff acknowledged.
+DONE: published at https://johanliebert66.github.io/quran-fagr/ (repo JohanLiebert66/quran-fagr).
+
+## 2026-05-29 — automated daily generation (quota-aware)
+Windows Scheduled Task `quran-fagr-daily` runs `daily-update.ps1` at 11:00 (after the
+~10:00 Cairo free-tier reset), `StartWhenAvailable` so it catches up if the PC was off.
+Each run: contemplate.py (resume, ~20 surahs, stop on quota) → aggregate.py → mkdocs
+gh-deploy. Never overwrites existing surahs. Disable once all 114 are done.
+
+## 2026-05-29 — decided: Fajr notes in Markdown, not Excel
+For quick on-the-fly capture + relate-later, editing Markdown (in Obsidian, the user's
+main app) beats Excel: lower friction, mobile-friendly, native #tags and links. So
+`surahs/fajr/*.md` are hand-edited; `build_notes.py`/Excel kept only as an optional bulk
+importer (and excluded from the daily task so it can't clobber hand edits).
+
+## 2026-05-29 — tagging/linking convention
+- Topic: inline `#توحيد` etc. → found via full-text search.
+- Surah/verse: Markdown link `[البقرة](../quran/002-البقرة.md)` → clickable + searchable.
+- Page-level `tags:` frontmatter → listed on the الوسوم index (Material tags plugin, 9.7
+  in-page marker `<!-- material/tags -->`, not the deprecated `tags_file`).

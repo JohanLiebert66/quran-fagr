@@ -24,24 +24,27 @@ quran-fagr/
 ├── ideas.md             ← dated idea log (append-only)
 ├── resources.md         ← tools/APIs used by this project
 ├── environment.yml      ← conda environment (primary setup)
-├── mkdocs.yml           ← MkDocs Material site config (RTL/Arabic, awesome-pages)
+├── mkdocs.yml           ← MkDocs Material site config (RTL/Arabic, awesome-pages, tags)
+├── daily-update.ps1     ← runs daily via Task Scheduler: generate batch → aggregate → deploy
 ├── .env                 ← your GEMINI_API_KEY (gitignored — paste your key here)
 ├── .gitignore
-├── fagr.docx            ← the original Google Doc export (reference only)
-├── fajr-notes.xlsx      ← YOUR manual daily notes (edit this; gitignore-safe to share)
+├── fagr.docx            ← the original Google Doc export (reference only; gitignored)
+├── fajr-notes.xlsx      ← OPTIONAL Excel input for notes (Markdown editing is recommended)
+├── logs/                ← daily-task logs (gitignored)
 ├── scripts/
 │   ├── surahs.py        ← the 114 surahs (number + name) — shared reference data
 │   ├── prompt.md        ← the تدبّر question + the fixed output structure (edit freely)
 │   ├── contemplate.py   ← Gemini → one Markdown file per surah (→ surahs/quran/)
 │   ├── aggregate.py     ← collect بلاغة/نحو across surahs (→ surahs/quran/_تجميع-*.md)
-│   ├── build_notes.py   ← fajr-notes.xlsx → category pages (→ surahs/fajr/)
+│   ├── build_notes.py   ← OPTIONAL: fajr-notes.xlsx → category pages (overwrites them)
 │   ├── combine.py       ← merge all surahs into one Markdown for Docs export
 │   └── requirements.txt
 └── surahs/              ← MkDocs docs_dir
     ├── index.md         ← home page
-    ├── .pages           ← top-level nav order (home, تدبر السور, مشاركات الفجر)
+    ├── tags.md          ← الوسوم — the tag index page
+    ├── .pages           ← top-level nav order (home, تدبر السور, مشاركات الفجر, الوسوم)
     ├── quran/           ← MAIN SECTION "تدبر السور": 001-*.md … + _تجميع-*.md
-    └── fajr/            ← MAIN SECTION "مشاركات حلقة الفجر": one page per category
+    └── fajr/            ← MAIN SECTION "مشاركات حلقة الفجر": one .md per category (edit these)
 ```
 
 ### Site navigation (left sidebar)
@@ -100,26 +103,41 @@ unless `--force`.
 > To finish faster: switch `MODEL` in `contemplate.py` to a model with a larger free
 > allowance (e.g. `gemini-2.5-flash-lite` — check current limits), or enable billing.
 
-## Daily Fajr notes (Excel)
+## Fajr notes — write in Markdown (recommended)
 
-Your manually-curated notes live in **`fajr-notes.xlsx`** (one row = one note):
+Each category under **مشاركات حلقة الفجر** is a plain Markdown file in `surahs/fajr/`.
+**Capture notes by editing these files directly** (ideally in Obsidian — fast, works on
+mobile). This is recommended over Excel for on-the-fly note-taking.
 
-| القسم | التاريخ | العنوان | المحتوى | المرجع |
-|-------|---------|---------|---------|--------|
-| فوائد لغوية | 2026-05-29 | الفرق بين الحِلم والأناة | … | صحيح مسلم |
+- **Add a note:** open the category file (e.g. `surahs/fajr/فوائد-لغوية.md`) and paste a
+  block at the top:
+  ```markdown
+  ## عنوان الفائدة
+  *2026-05-29 · #توحيد #رحمة · متعلّقة بـ [البقرة](../quran/002-البقرة.md)*
 
-```powershell
-conda activate quran-fagr
-cd scripts
-python build_notes.py --init   # one time: creates fajr-notes.xlsx with example rows
-# …edit fajr-notes.xlsx, add your notes…
-python build_notes.py          # regenerates surahs/fajr/*.md from the sheet
-```
+  نص الملاحظة…
+  ```
+- **New category** = create a new file, e.g. `surahs/fajr/سيرة.md` with a `# سيرة` heading.
+  It appears in the sidebar automatically (alphabetical).
 
-- The **القسم** column decides the subsection. Type a brand-new category (e.g. `سيرة`)
-  and a new page appears automatically — no code change. Delete all rows of a category
-  and its page is removed on the next run.
-- Notes are grouped per category, newest date first. Edit the sheet, re-run, rebuild.
+### Linking & tagging (so you can search and relate later)
+- **Topic tag** — write `#توحيد` `#رحمة` anywhere in the note. Find it later via the
+  site's **search box** 🔍 (it indexes the full text, including these inline tags).
+- **Link to a surah/verse** — a normal Markdown link to that surah's page:
+  `[البقرة ٢٥٥](../quran/002-البقرة.md)`. It's **clickable** on the site and searchable.
+  General notes just carry `#tags`; surah-specific notes add the link too.
+- **Tag index page** — add `tags:` in a page's frontmatter (see `فوائد-لغوية.md`) and that
+  page is listed on the **الوسوم** page for browsing by topic.
+
+### Optional: bulk-enter notes via Excel
+If you'd rather type notes in a spreadsheet, `scripts/build_notes.py` reads `fajr-notes.xlsx`
+(columns القسم / التاريخ / العنوان / المحتوى / المرجع) and generates the category pages.
+⚠️ It **overwrites** the pages it manages — so for any given category, pick *either*
+hand-edited Markdown *or* Excel, not both. (`python build_notes.py --init` creates the
+template; `python build_notes.py` regenerates.) The daily auto-task does **not** run it,
+so your hand-edited notes are safe.
+
+## Display — MkDocs site (chosen)
 
 ## Display — MkDocs site (chosen)
 
@@ -140,6 +158,45 @@ number. `surahs/index.md` is the home page. Run `aggregate.py` before building s
 - **Obsidian** — point a vault at `surahs/`; RTL + outline work out of the box.
 - **Google Doc** — `combine.py` → `pandoc _combined.md -o quran-fagr.docx` → upload
   to Drive. The H1-per-surah outline acts like tabs for navigation.
+
+## Edit any page & publish — the everyday workflow
+
+Every page on the site is a Markdown file under `surahs/`:
+
+| To change… | Edit this file |
+|------------|----------------|
+| A surah's analysis | `surahs/quran/NNN-name.md` |
+| A Fajr-notes category | `surahs/fajr/<category>.md` |
+| The home page | `surahs/index.md` |
+
+Then, in **3 steps**:
+```powershell
+conda activate quran-fagr
+# 1. edit the .md file(s) …
+python -m mkdocs serve          # 2. (optional) preview at http://127.0.0.1:8000 — live-reloads
+python -m mkdocs gh-deploy --remote-name origin   # 3. publish → live in ~1 min
+```
+
+- There's no live sync: changes appear online only after `gh-deploy`. `mkdocs serve` is a
+  *local* preview that reloads instantly as you type.
+- Hand-edits to surah pages are **safe** — `contemplate.py` skips files that already exist;
+  only `contemplate.py --force <n>` regenerates (and overwrites) a surah.
+
+## Automated daily surah generation
+
+A Windows Scheduled Task **`quran-fagr-daily`** runs [daily-update.ps1](daily-update.ps1)
+every day at **11:00** (just after the free-tier quota resets ~10:00 Cairo). Each run:
+resumes from the first missing surah → generates ~20 → refreshes the aggregates →
+`gh-deploy`s the site. It **never overwrites** existing surahs.
+
+- **Catch-up:** if the PC is off at 11:00, it runs as soon as you next log in
+  (`StartWhenAvailable`).
+- **Logs:** `logs/daily-YYYY-MM-DD.log` (gitignored).
+- **Run it now manually:** `powershell -File daily-update.ps1`
+- **Change the time:**
+  `Set-ScheduledTask quran-fagr-daily -Trigger (New-ScheduledTaskTrigger -Daily -At 7:00pm)`
+- **Disable / remove** (e.g. once all 114 are done):
+  `Disable-ScheduledTask quran-fagr-daily`  or  `Unregister-ScheduledTask quran-fagr-daily -Confirm:$false`
 
 ## Share the site with friends
 

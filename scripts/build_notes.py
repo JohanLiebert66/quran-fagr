@@ -1,10 +1,16 @@
 # -*- coding: utf-8 -*-
 """
-build_notes.py — توليد صفحات "مشاركات حلقة الفجر" من ملف Excel.
+build_notes.py — (اختياري) توليد صفحات "مشاركات حلقة الفجر" من ملف Excel.
+
+الطريقة المُوصى بها لمشاركات الفجر هي تحرير ملفات surahs/fajr/*.md مباشرةً (في Obsidian).
+هذا السكربت بديلٌ لمن يفضّل إدخال الملاحظات في جدول Excel.
+
+⚠️ تنبيه: يستبدل هذا السكربت محتوى صفحات الأقسام في surahs/fajr/ ويحذف أي صفحة قسم
+لا يقابلها صف في الإكسل — فلا تخلط بين التحرير اليدوي وهذا السكربت لنفس القسم.
 
 يقرأ fajr-notes.xlsx (في جذر المشروع)، يجمّع الصفوف حسب عمود "القسم"،
-ويكتب صفحة Markdown لكل قسم داخل surahs/fajr/ مع ملف .pages للعنوان والترتيب.
-الأقسام ديناميكية: أي قسم جديد تكتبه في Excel يصير صفحة جديدة تلقائيًا.
+ويكتب صفحة Markdown لكل قسم داخل surahs/fajr/. الأقسام ديناميكية: أي قسم جديد في Excel
+يصير صفحة جديدة تلقائيًا.
 
 الأعمدة المتوقعة (الصف الأول رؤوس):
     القسم | التاريخ | العنوان | المحتوى | المرجع
@@ -131,8 +137,9 @@ def build() -> None:
             stale.unlink()
             print(f"− حُذف قسم قديم: {stale.name}")
 
-    pages = [f"title: {SECTION_TITLE}", "nav:"] + [f"  - {f}" for f in nav_files]
-    (FAJR_DIR / ".pages").write_text("\n".join(pages) + "\n", encoding="utf-8")
+    (FAJR_DIR / ".pages").write_text(
+        f"title: {SECTION_TITLE}\norder: asc\n", encoding="utf-8"
+    )
     print(f"✓ .pages — {len(nav_files)} قسم")
 
 
