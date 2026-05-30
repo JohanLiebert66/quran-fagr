@@ -1,0 +1,80 @@
+/* خطوط عربية احترافية بأوزان حقيقية (Bold/Regular) من Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;500;700&family=Cairo:wght@500;600;700&family=Amiri:wght@400;700&display=swap');
+
+/* ---------- الخطوط الافتراضية للموقع ---------- */
+:root {
+  --md-text-font-family: "Noto Naskh Arabic", "Cairo", system-ui, "Segoe UI", sans-serif;
+  --md-code-font-family: "JetBrains Mono", "Roboto Mono", Consolas, monospace;
+}
+
+/* النص الأساسي: تكبير المقاس ومساحة بين الأسطر لراحة قراءة العربية */
+.md-typeset {
+  font-family: var(--md-text-font-family);
+  font-size: 1.05rem;       /* ~16.8px — أوضح مع الحركات */
+  line-height: 1.95;
+}
+
+/* العناوين: Cairo بوزن سميك يعطي ثقلًا واضحًا */
+.md-typeset h1, .md-typeset h2, .md-typeset h3,
+.md-typeset h4, .md-typeset h5, .md-typeset h6 {
+  font-family: "Cairo", "Noto Naskh Arabic", sans-serif;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+/* الواجهة (الشريط الجانبي والعلوي): خط نظيف بأوزان واضحة */
+.md-nav, .md-tabs, .md-header, .md-footer {
+  font-family: "Cairo", "Noto Naskh Arabic", sans-serif;
+}
+
+/* ---------- تنسيقات الـ Markdown ----------
+   العربية ليس لها مائل (italic) حقيقي، فنُحوّل *النص* إلى لون مميّز + وزن أثقل
+   حتى يظهر فعليًا بدل أن يبدو كنص عادي. */
+.md-typeset em {
+  font-style: normal;
+  color: var(--md-accent-fg-color);
+  font-weight: 500;
+}
+
+/* **نص** يظهر بوزن سميك حقيقي (700) من الخط المحمَّل */
+.md-typeset strong {
+  font-weight: 700;
+  color: var(--md-default-fg-color);
+}
+
+/* ==نص== للتظليل (يحتاج pymdownx.mark) */
+.md-typeset mark {
+  background: rgba(255, 213, 79, .55);
+  padding: 0 .25em;
+  border-radius: 3px;
+}
+
+/* ~~شطب~~ */
+.md-typeset del { text-decoration: line-through; opacity: .75; }
+
+/* ---------- إبراز الآيات: استخدم > "..." (Blockquote) ----------
+   صندوق بإطار جانبي ولون خفيف ومسافة مريحة، وخط أميري المخصّص للقرآن */
+.md-typeset blockquote {
+  border-right: 4px solid var(--md-primary-fg-color);
+  border-left: none;
+  background: rgba(0, 150, 136, .07);
+  padding: 1em 1.4em;
+  border-radius: 6px;
+  margin: 1.2em 0;
+  font-family: "Amiri", "Noto Naskh Arabic", serif;
+  font-size: 1.2rem;
+  color: var(--md-default-fg-color);
+}
+.md-typeset blockquote > :first-child { margin-top: 0; }
+.md-typeset blockquote > :last-child  { margin-bottom: 0; }
+
+/* عرض أوسع للقراءة المريحة */
+.md-grid { max-width: 1280px; }
+
+/* أرقام الآيات وأرقام السور تبقى بأرقام عربية مغربية أو هندية حسب الخط — تركها لِما يختاره النص */
+
+/* تحسين شكل الأكواد المضمَّنة */
+.md-typeset code {
+  font-size: .92em;
+  padding: .1em .35em;
+}

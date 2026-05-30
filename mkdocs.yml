@@ -6,7 +6,11 @@ theme:
   name: material
   language: ar          # يفعّل اتجاه RTL تلقائيًا للعربية
   direction: rtl
+  font: false           # نُحمّل خطوطنا العربية من extra.css بدل خطوط Material الافتراضية
   features:
+    - navigation.tabs           # الأقسام الرئيسية تظهر تبويبات أعلى الموقع
+    - navigation.tabs.sticky    # التبويبات تبقى ظاهرة عند التمرير
+    - navigation.sections       # تجميع الأقسام في الشريط الجانبي
     - navigation.top
     - navigation.instant
     - navigation.tracking
@@ -14,6 +18,7 @@ theme:
     - search.highlight
     - toc.follow
     - content.code.copy
+    - content.tooltips          # معاينة الروابط عند المرور
   palette:
     - scheme: default
       primary: teal
@@ -34,6 +39,20 @@ markdown_extensions:
   - admonition
   - tables
   - attr_list
+  - md_in_html
+  - pymdownx.betterem        # تحسين تمييز *مائل* و **سميك** خصوصًا داخل الكلمات
+  - pymdownx.mark            # ==تظليل==
+  - pymdownx.tilde           # ~~شطب~~
+  - pymdownx.caret           # ^مرتفع^
+  - pymdownx.keys            # ++Ctrl+C++
+  - pymdownx.details         # admonitions قابلة للطيّ
+  - pymdownx.superfences     # كتل كود محسَّنة
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite    # تلوين الكود السطري
+
+extra_css:
+  - stylesheets/extra.css    # الخطوط العربية + ستايل آيات + لون التشديد
 
 plugins:
   - search:

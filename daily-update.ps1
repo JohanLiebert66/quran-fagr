@@ -13,7 +13,8 @@ $log = Join-Path $logDir ("daily-" + (Get-Date -Format "yyyy-MM-dd") + ".log")
 
 Set-Location $proj
 "==== $(Get-Date -Format 'yyyy-MM-dd HH:mm') START ====" | Tee-Object -FilePath $log -Append
-& $py "scripts\contemplate.py"  | Tee-Object -FilePath $log -Append   # ~20 سورة/يوم ثم يتوقف
-& $py "scripts\aggregate.py"    | Tee-Object -FilePath $log -Append   # تحديث تجميع بلاغة/نحو
+& $py "scripts\contemplate.py"       | Tee-Object -FilePath $log -Append   # ~20 سورة/يوم ثم يتوقف
+& $py "scripts\aggregate.py"         | Tee-Object -FilePath $log -Append   # تحديث تجميع بلاغة/نحو
+& $py "scripts\build_surah_index.py" | Tee-Object -FilePath $log -Append   # فهرس الملاحظات حسب السورة
 & $py -m mkdocs gh-deploy --remote-name origin | Tee-Object -FilePath $log -Append
 "==== $(Get-Date -Format 'yyyy-MM-dd HH:mm') DONE ====" | Tee-Object -FilePath $log -Append

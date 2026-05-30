@@ -97,10 +97,11 @@ def save(number: int, name: str, body: str) -> Path:
         f"slug: {number:03d}-{slug(name)}\n"
         f"generated: {today}\n"
         f"model: {MODEL}\n"
-        "tags: [quran, tadabbur, balagha, nahw]\n"
         "---\n\n"
         f"# {number:03d} — سورة {name}\n\n"
     )
+    # ملاحظة: لا نضع وسومًا عامة في frontmatter — كانت تتكرر في كل سورة فتفسد فهرس الوسوم.
+    # الوسوم تُكتب يدويًا في صفحات مشاركات الفجر، أو يُستخدم البحث للعثور على سورة بعينها.
     path = out_path(number, name)
     path.write_text(frontmatter + body + "\n", encoding="utf-8")
     return path

@@ -2,4 +2,5 @@ nav:
   - الرئيسية: index.md
   - quran
   - fajr
+  - فهرس حسب السورة: notes-by-surah.md
   - الوسوم: tags.md
