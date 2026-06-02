@@ -4,6 +4,7 @@ _combined.md
 fagr.docx
 logs/
 scripts/data/
+.obsidian/
 __pycache__/
 *.pyc
 .ipynb_checkpoints/
