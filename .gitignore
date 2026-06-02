@@ -3,6 +3,7 @@ site/
 _combined.md
 fagr.docx
 logs/
+scripts/data/
 __pycache__/
 *.pyc
 .ipynb_checkpoints/

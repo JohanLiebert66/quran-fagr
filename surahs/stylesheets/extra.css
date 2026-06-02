@@ -14,13 +14,32 @@
   line-height: 1.95;
 }
 
-/* العناوين: Cairo بوزن سميك يعطي ثقلًا واضحًا */
+/* العناوين: Cairo بوزن سميك يعطي ثقلًا واضحًا، مع تكبير ملحوظ */
 .md-typeset h1, .md-typeset h2, .md-typeset h3,
 .md-typeset h4, .md-typeset h5, .md-typeset h6 {
   font-family: "Cairo", "Noto Naskh Arabic", sans-serif;
   font-weight: 700;
   line-height: 1.4;
 }
+.md-typeset h1 { font-size: 2.1rem; margin-top: .8em; }
+.md-typeset h2 { font-size: 1.65rem; margin-top: 1.8em; }
+.md-typeset h3 { font-size: 1.3rem;  margin-top: 1.4em; }
+.md-typeset h4 { font-size: 1.1rem;  margin-top: 1.2em; }
+
+/* رمز رابط المشاركة بجوار كل عنوان — مرئي دائمًا بشكل خفيف، واضح عند المرور */
+.md-typeset .headerlink {
+  opacity: 0.35;
+  margin-inline-start: 0.5em;
+  font-size: 0.7em;
+  color: var(--md-accent-fg-color);
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+.md-typeset h1:hover .headerlink,
+.md-typeset h2:hover .headerlink,
+.md-typeset h3:hover .headerlink,
+.md-typeset h4:hover .headerlink,
+.md-typeset .headerlink:hover { opacity: 1; }
 
 /* الواجهة (الشريط الجانبي والعلوي): خط نظيف بأوزان واضحة */
 .md-nav, .md-tabs, .md-header, .md-footer {

@@ -17,6 +17,7 @@ theme:
     - search.suggest
     - search.highlight
     - toc.follow
+    - toc.integrate             # عناوين الصفحة (H2/H3) تندمج في الشريط الجانبي للتنقّل المباشر
     - content.code.copy
     - content.tooltips          # معاينة الروابط عند المرور
   palette:
@@ -35,7 +36,7 @@ theme:
 
 markdown_extensions:
   - toc:
-      permalink: true
+      permalink: "🔗"          # رمز "نسخ رابط القسم" يظهر بجوار كل عنوان للمشاركة المباشرة
   - admonition
   - tables
   - attr_list
