@@ -30,6 +30,9 @@ KHATMAS = SURAHS / "khatmas"
 REGISTRY = KHATMAS / "index.md"
 
 NOTE_DIRS = [SURAHS / "fajr", SURAHS / "verses"]
+QURAN = SURAHS / "quran"
+GEN_RE_FM = re.compile(r"^generated:\s*(\d{4}-\d{2}-\d{2})", re.MULTILINE)
+H1_RE = re.compile(r"^#\s+(.+?)\s*$", re.MULTILINE)
 
 # صف بيانات داخل جدول Markdown: |a|b|c|d|  (ليس صف الفواصل ---)
 ROW_RE = re.compile(r"^\s*\|([^|\n]+)\|([^|\n]+)\|([^|\n]+)\|([^|\n]+)\|\s*$", re.MULTILINE)
@@ -70,8 +73,10 @@ def slug(name: str) -> str:
 
 
 def collect_notes() -> list[dict]:
-    """يُعيد قائمة من (date, source_rel, source_label, title, snippet)."""
+    """يُعيد قائمة من (date, source_rel, source_label, title, snippet)
+    — من ملاحظاتك اليدوية فقط، دون السور المولَّدة آليًا."""
     out = []
+
     for d in NOTE_DIRS:
         if not d.exists():
             continue

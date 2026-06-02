@@ -37,23 +37,9 @@ GEN_RE = re.compile(r"^generated:\s*(\d{4}-\d{2}-\d{2})", re.MULTILINE)
 def collect() -> list[dict]:
     items = []
 
-    # 1) صفحات السور — حقل generated في frontmatter
-    if QURAN.exists():
-        for f in sorted(QURAN.glob("[0-9]*.md")):
-            text = f.read_text(encoding="utf-8")
-            gm = GEN_RE.search(text)
-            hm = H1_RE.search(text)
-            if not gm:
-                continue
-            y, m, d = map(int, gm.group(1).split("-"))
-            items.append({
-                "date": date(y, m, d),
-                "title": hm.group(1).strip() if hm else f.stem,
-                "rel": f.relative_to(SURAHS).as_posix(),
-                "label": "تدبر سورة",
-            })
+    # لا ندرج صفحات السور المُولَّدة آليًا — "الجديد" خاصٌّ بما تضيفه يدويًا.
 
-    # 2) ملاحظات الفجر والآيات — كل H2 + ميتاداتا تاريخها
+    # ملاحظات الفجر والآيات فقط — كل H2 + ميتاداتا تاريخها
     for d_dir in NOTE_DIRS:
         if not d_dir.exists():
             continue

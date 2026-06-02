@@ -167,9 +167,27 @@ Every page on the site is a Markdown file under `surahs/`:
 |------------|----------------|
 | A surah's analysis | `surahs/quran/NNN-name.md` |
 | A Fajr-notes category | `surahs/fajr/<category>.md` |
+| A per-verse note | `surahs/verses/NNN-name.md` (one H2 per verse) |
+| A khatma | the table in `surahs/khatmas/index.md` |
 | The home page | `surahs/index.md` |
 
-Then, in **3 steps**:
+### Edit from any device — GitHub web editor (auto-deploys)
+
+Open https://github.com/JohanLiebert66/quran-fagr on phone or browser →
+navigate to the file → **✏️ Edit** → write Markdown → **Commit**.
+
+A **GitHub Actions workflow** ([.github/workflows/deploy.yml](.github/workflows/deploy.yml))
+auto-triggers on every push to `main`:
+- Installs deps, runs `aggregate.py` + `build_surah_index.py` + `build_khatmas.py`
+  + `build_whatsnew.py` to refresh derived pages.
+- Builds and deploys to `gh-pages`.
+
+So edits from the web editor become live on
+[the site](https://johanliebert66.github.io/quran-fagr/) within ~2 minutes, **no
+local action required**. Status of any run: the repo's **Actions** tab.
+
+### Edit locally — the 3-step flow
+
 ```powershell
 conda activate quran-fagr
 # 1. edit the .md file(s) …
@@ -177,8 +195,9 @@ python -m mkdocs serve          # 2. (optional) preview at http://127.0.0.1:8000
 python -m mkdocs gh-deploy --remote-name origin   # 3. publish → live in ~1 min
 ```
 
-- There's no live sync: changes appear online only after `gh-deploy`. `mkdocs serve` is a
-  *local* preview that reloads instantly as you type.
+- There's no live sync: changes appear online only after `gh-deploy` (local) or after
+  pushing to `main` (GitHub web editor). `mkdocs serve` is a *local* preview that reloads
+  instantly as you type.
 - Hand-edits to surah pages are **safe** — `contemplate.py` skips files that already exist;
   only `contemplate.py --force <n>` regenerates (and overwrites) a surah.
 

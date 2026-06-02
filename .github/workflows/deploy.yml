@@ -1,0 +1,52 @@
+name: Build and deploy site
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - "README.md"
+      - "context.md"
+      - "ideas.md"
+      - "resources.md"
+      - "logs/**"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pages-deploy
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # gh-deploy needs full history
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r scripts/requirements.txt
+
+      - name: Refresh derived pages
+        run: |
+          python scripts/aggregate.py
+          python scripts/build_surah_index.py
+          python scripts/build_khatmas.py
+          python scripts/build_whatsnew.py
+
+      - name: Configure git identity
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Build and deploy to gh-pages
+        run: python -m mkdocs gh-deploy --force --no-history --remote-name origin
