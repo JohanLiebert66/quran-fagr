@@ -97,3 +97,152 @@
   font-size: .92em;
   padding: .1em .35em;
 }
+
+/* ---------- شارة نوع الملاحظة (note-type chip) ----------
+   يحقنها hook note_types.py قبل سطر الميتاداتا حسب موقع الصفحة:
+   تأمل / لغة / بلاغة / فقه / تجويد / سؤال. */
+.md-typeset .note-type {
+  display: inline-block;
+  font-family: "Cairo", "Noto Naskh Arabic", sans-serif;
+  font-size: .72rem;
+  font-weight: 600;
+  line-height: 1.4;
+  padding: .12em .7em;
+  margin-inline-end: .55em;
+  border-radius: 999px;
+  vertical-align: middle;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+/* تأمّل — لون السمة (تركواز) */
+.md-typeset .note-type--reflection {
+  background: rgba(0, 150, 136, .12);
+  color: var(--md-primary-fg-color);
+  border-color: rgba(0, 150, 136, .35);
+}
+/* لغة/بلاغة — بنفسجي */
+.md-typeset .note-type--linguistic {
+  background: rgba(124, 77, 255, .12);
+  color: #6a3fd6;
+  border-color: rgba(124, 77, 255, .35);
+}
+/* فقه/تجويد — كهرماني */
+.md-typeset .note-type--research {
+  background: rgba(245, 124, 0, .14);
+  color: #b35c00;
+  border-color: rgba(245, 124, 0, .38);
+}
+/* سؤال — أحمر هادئ */
+.md-typeset .note-type--question {
+  background: rgba(229, 57, 53, .12);
+  color: #c62828;
+  border-color: rgba(229, 57, 53, .35);
+}
+
+/* في الوضع الليلي ارفع وضوح النص قليلًا */
+[data-md-color-scheme="slate"] .md-typeset .note-type--linguistic { color: #b39ddf; }
+[data-md-color-scheme="slate"] .md-typeset .note-type--research   { color: #ffb74d; }
+[data-md-color-scheme="slate"] .md-typeset .note-type--question   { color: #ef9a9a; }
+
+/* ---------- تخطيط بطاقة الملاحظة (note card) ----------
+   يُطبَّق فقط على صفحات الملاحظات (التي تحوي شارة .note-type)،
+   فلا يمسّ صفحات تدبر السور المُولَّدة. كل ملاحظة = عنوان H2 يفصله خط
+   علوي، يليه سطر ميتاداتا بشكل شريط بطاقة خفيف. */
+
+/* فاصل علوي وعنوان بارز لكل ملاحظة */
+.md-typeset:has(.note-type) h2 {
+  margin-top: 2.6em;
+  padding-top: 1.1em;
+  border-top: 1px solid var(--md-default-fg-color--lightest);
+}
+.md-typeset:has(.note-type) h2:first-of-type {
+  border-top: none;
+  padding-top: 0;
+  margin-top: 1em;
+}
+
+/* سطر الميتاداتا (يحوي الشارة) كشريط بطاقة خفيف أسفل العنوان مباشرة */
+.md-typeset p:has(.note-type) {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .25em .1em;
+  margin-top: .35em;
+  padding: .45em .85em;
+  background: var(--md-default-fg-color--lightest);
+  border-radius: 8px;
+}
+/* نصّ الميتاداتا داخل الشريط: مكتوم بدل لون السمة الافتراضي للـ em */
+.md-typeset p:has(.note-type) em {
+  font-style: normal;
+  font-weight: 500;
+  color: var(--md-default-fg-color--light);
+}
+
+/* رِفّ جانبي ملوّن حسب نوع الملاحظة (border منطقي يحترم RTL) */
+.md-typeset p:has(.note-type--reflection) { border-inline-start: 3px solid var(--md-primary-fg-color); }
+.md-typeset p:has(.note-type--linguistic) { border-inline-start: 3px solid #7c4dff; }
+.md-typeset p:has(.note-type--research)   { border-inline-start: 3px solid #f57c00; }
+.md-typeset p:has(.note-type--question)   { border-inline-start: 3px solid #e53935; }
+
+/* شارة الختمة — محايدة ومُحدَّدة بإطار فقط، تمييزًا لها عن شارة النوع */
+.md-typeset .note-type--khatma {
+  background: transparent;
+  color: var(--md-default-fg-color--light);
+  border-color: var(--md-default-fg-color--lighter);
+}
+
+/* ---------- الخط الزمني للآيات (verses timeline) ----------
+   يلفّ hook note_types.py كل ملاحظة في .tl-note ويُدرِج .tl-sep عند تغيّر
+   الختمة؛ هنا نرسم الخط الرأسي والنقاط. */
+
+/* فاصل الختمة بين مجموعات الملاحظات */
+.md-typeset .tl-sep {
+  font-family: "Cairo", "Noto Naskh Arabic", sans-serif;
+  font-weight: 700;
+  font-size: .95rem;
+  color: var(--md-primary-fg-color);
+  margin: 2.6em 0 1em;
+  padding-bottom: .4em;
+  border-bottom: 2px solid var(--md-default-fg-color--lightest);
+}
+
+/* بطاقة ملاحظة على الريل الزمني */
+.md-typeset .tl-note {
+  position: relative;
+  padding-inline-start: 1.6rem;
+}
+/* الخط العمودي المستمر (يمتد لأسفل ليصل بالبطاقة التالية) */
+.md-typeset .tl-note::before {
+  content: "";
+  position: absolute;
+  inset-inline-start: .42rem;
+  top: .2rem;
+  bottom: -1.2rem;
+  width: 2px;
+  background: var(--md-default-fg-color--lightest);
+}
+.md-typeset .tl-note:last-child::before { bottom: auto; height: 1.7rem; }
+/* النقطة على الخط، بمحاذاة عنوان الملاحظة */
+.md-typeset .tl-note::after {
+  content: "";
+  position: absolute;
+  inset-inline-start: 0;
+  top: .8rem;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: var(--md-primary-fg-color);
+  border: 3px solid var(--md-default-bg-color);
+}
+.md-typeset .tl-note--linguistic::after { background: #7c4dff; }
+.md-typeset .tl-note--research::after   { background: #f57c00; }
+.md-typeset .tl-note--question::after   { background: #e53935; }
+
+/* داخل بطاقة الريل: الريل يكفي للفصل، فألغِ الفاصل العلوي للعنوان */
+.md-typeset .tl-note h2 {
+  border-top: none;
+  padding-top: 0;
+  margin-top: 0;
+}

@@ -60,3 +60,6 @@ plugins:
       lang: ar
   - tags            # فهرس الوسوم يُدرَج في صفحة tags.md عبر العلامة <!-- material/tags -->
   - awesome-pages   # يبني القائمة الجانبية من بنية المجلدات وملفات .pages
+
+hooks:
+  - scripts/hooks/note_types.py   # يُلصق شارة نوع الملاحظة (تأمل/لغة/سؤال…) حسب موقع الصفحة

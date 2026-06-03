@@ -24,6 +24,9 @@ try:
 except Exception:
     pass
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from khatmas_registry import parse_registry, in_range
+
 PROJECT = Path(__file__).resolve().parent.parent
 SURAHS = PROJECT / "surahs"
 KHATMAS = SURAHS / "khatmas"
@@ -34,38 +37,9 @@ QURAN = SURAHS / "quran"
 GEN_RE_FM = re.compile(r"^generated:\s*(\d{4}-\d{2}-\d{2})", re.MULTILINE)
 H1_RE = re.compile(r"^#\s+(.+?)\s*$", re.MULTILINE)
 
-# صف بيانات داخل جدول Markdown: |a|b|c|d|  (ليس صف الفواصل ---)
-ROW_RE = re.compile(r"^\s*\|([^|\n]+)\|([^|\n]+)\|([^|\n]+)\|([^|\n]+)\|\s*$", re.MULTILINE)
 DATE_RE = re.compile(r"(\d{4})-(\d{2})-(\d{2})")
 HEAD_RE = re.compile(r"^##\s+(.+?)\s*$", re.MULTILINE)
 META_RE = re.compile(r"^\s*\*([^\n*]+)\*\s*$", re.MULTILINE)
-
-
-def parse_registry() -> list[dict]:
-    if not REGISTRY.exists():
-        return []
-    text = REGISTRY.read_text(encoding="utf-8")
-    out = []
-    for m in ROW_RE.finditer(text):
-        a, b, c, d = (x.strip() for x in m.groups())
-        # تجاهَل صف الرؤوس
-        if a.isdigit() is False:
-            continue
-        start_m = DATE_RE.search(c)
-        end_m = DATE_RE.search(d)
-        if not start_m:
-            continue
-        start = date(int(start_m.group(1)), int(start_m.group(2)), int(start_m.group(3)))
-        end = None
-        if end_m:
-            end = date(int(end_m.group(1)), int(end_m.group(2)), int(end_m.group(3)))
-        out.append({
-            "number": int(a),
-            "name": b,
-            "start": start,
-            "end": end,
-        })
-    return sorted(out, key=lambda k: k["number"])
 
 
 def slug(name: str) -> str:
@@ -127,14 +101,6 @@ def collect_notes() -> list[dict]:
     return out
 
 
-def in_range(note_date: date, k: dict) -> bool:
-    if note_date < k["start"]:
-        return False
-    if k["end"] is None:
-        return note_date <= date.today()
-    return note_date <= k["end"]
-
-
 def write_khatma_page(k: dict, notes: list[dict]) -> Path:
     notes = sorted(notes, key=lambda n: n["date"])
     fname = f"{k['number']:03d}-{slug(k['name'])}.md"
@@ -169,7 +135,7 @@ def write_khatma_page(k: dict, notes: list[dict]) -> Path:
 
 def main() -> None:
     KHATMAS.mkdir(parents=True, exist_ok=True)
-    khatmas = parse_registry()
+    khatmas = parse_registry(REGISTRY)
     if not khatmas:
         print("لا يوجد سجل ختمات بعد — أضف صفًّا للجدول في khatmas/index.md")
         return

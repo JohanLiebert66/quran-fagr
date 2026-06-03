@@ -36,6 +36,9 @@ jobs:
       - name: Install dependencies
         run: pip install -r scripts/requirements.txt
 
+      - name: Validate note metadata
+        run: python scripts/validate_notes.py
+
       - name: Refresh derived pages
         run: |
           python scripts/aggregate.py
