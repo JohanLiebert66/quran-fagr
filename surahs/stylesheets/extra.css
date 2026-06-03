@@ -144,3 +144,44 @@
 [data-md-color-scheme="slate"] .md-typeset .note-type--linguistic { color: #b39ddf; }
 [data-md-color-scheme="slate"] .md-typeset .note-type--research   { color: #ffb74d; }
 [data-md-color-scheme="slate"] .md-typeset .note-type--question   { color: #ef9a9a; }
+
+/* ---------- تخطيط بطاقة الملاحظة (note card) ----------
+   يُطبَّق فقط على صفحات الملاحظات (التي تحوي شارة .note-type)،
+   فلا يمسّ صفحات تدبر السور المُولَّدة. كل ملاحظة = عنوان H2 يفصله خط
+   علوي، يليه سطر ميتاداتا بشكل شريط بطاقة خفيف. */
+
+/* فاصل علوي وعنوان بارز لكل ملاحظة */
+.md-typeset:has(.note-type) h2 {
+  margin-top: 2.6em;
+  padding-top: 1.1em;
+  border-top: 1px solid var(--md-default-fg-color--lightest);
+}
+.md-typeset:has(.note-type) h2:first-of-type {
+  border-top: none;
+  padding-top: 0;
+  margin-top: 1em;
+}
+
+/* سطر الميتاداتا (يحوي الشارة) كشريط بطاقة خفيف أسفل العنوان مباشرة */
+.md-typeset p:has(.note-type) {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .25em .1em;
+  margin-top: .35em;
+  padding: .45em .85em;
+  background: var(--md-default-fg-color--lightest);
+  border-radius: 8px;
+}
+/* نصّ الميتاداتا داخل الشريط: مكتوم بدل لون السمة الافتراضي للـ em */
+.md-typeset p:has(.note-type) em {
+  font-style: normal;
+  font-weight: 500;
+  color: var(--md-default-fg-color--light);
+}
+
+/* رِفّ جانبي ملوّن حسب نوع الملاحظة (border منطقي يحترم RTL) */
+.md-typeset p:has(.note-type--reflection) { border-inline-start: 3px solid var(--md-primary-fg-color); }
+.md-typeset p:has(.note-type--linguistic) { border-inline-start: 3px solid #7c4dff; }
+.md-typeset p:has(.note-type--research)   { border-inline-start: 3px solid #f57c00; }
+.md-typeset p:has(.note-type--question)   { border-inline-start: 3px solid #e53935; }
