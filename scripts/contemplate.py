@@ -34,7 +34,7 @@ except Exception:
     pass
 
 # ───────────────────────── الإعدادات ─────────────────────────
-MODEL = "gemini-2.5-flash"   # ضمن الطبقة المجانية؛ بدّلها بـ gemini-2.5-pro لتحليل أعمق
+MODEL = "gemini-3.5-flash"   # نموذج Flash الأحدث؛ بدّله بـ gemini-3.1-pro-preview لتحليل أعمق، أو gemini-flash-latest ليتبع الأحدث آليًا
 SLEEP_BETWEEN = 5            # ثوانٍ بين الطلبات (الحد المجاني ~15 طلب/دقيقة)
 MAX_RETRIES = 4
 
