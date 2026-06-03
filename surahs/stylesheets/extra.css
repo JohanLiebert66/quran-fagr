@@ -185,3 +185,64 @@
 .md-typeset p:has(.note-type--linguistic) { border-inline-start: 3px solid #7c4dff; }
 .md-typeset p:has(.note-type--research)   { border-inline-start: 3px solid #f57c00; }
 .md-typeset p:has(.note-type--question)   { border-inline-start: 3px solid #e53935; }
+
+/* شارة الختمة — محايدة ومُحدَّدة بإطار فقط، تمييزًا لها عن شارة النوع */
+.md-typeset .note-type--khatma {
+  background: transparent;
+  color: var(--md-default-fg-color--light);
+  border-color: var(--md-default-fg-color--lighter);
+}
+
+/* ---------- الخط الزمني للآيات (verses timeline) ----------
+   يلفّ hook note_types.py كل ملاحظة في .tl-note ويُدرِج .tl-sep عند تغيّر
+   الختمة؛ هنا نرسم الخط الرأسي والنقاط. */
+
+/* فاصل الختمة بين مجموعات الملاحظات */
+.md-typeset .tl-sep {
+  font-family: "Cairo", "Noto Naskh Arabic", sans-serif;
+  font-weight: 700;
+  font-size: .95rem;
+  color: var(--md-primary-fg-color);
+  margin: 2.6em 0 1em;
+  padding-bottom: .4em;
+  border-bottom: 2px solid var(--md-default-fg-color--lightest);
+}
+
+/* بطاقة ملاحظة على الريل الزمني */
+.md-typeset .tl-note {
+  position: relative;
+  padding-inline-start: 1.6rem;
+}
+/* الخط العمودي المستمر (يمتد لأسفل ليصل بالبطاقة التالية) */
+.md-typeset .tl-note::before {
+  content: "";
+  position: absolute;
+  inset-inline-start: .42rem;
+  top: .2rem;
+  bottom: -1.2rem;
+  width: 2px;
+  background: var(--md-default-fg-color--lightest);
+}
+.md-typeset .tl-note:last-child::before { bottom: auto; height: 1.7rem; }
+/* النقطة على الخط، بمحاذاة عنوان الملاحظة */
+.md-typeset .tl-note::after {
+  content: "";
+  position: absolute;
+  inset-inline-start: 0;
+  top: .8rem;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: var(--md-primary-fg-color);
+  border: 3px solid var(--md-default-bg-color);
+}
+.md-typeset .tl-note--linguistic::after { background: #7c4dff; }
+.md-typeset .tl-note--research::after   { background: #f57c00; }
+.md-typeset .tl-note--question::after   { background: #e53935; }
+
+/* داخل بطاقة الريل: الريل يكفي للفصل، فألغِ الفاصل العلوي للعنوان */
+.md-typeset .tl-note h2 {
+  border-top: none;
+  padding-top: 0;
+  margin-top: 0;
+}
