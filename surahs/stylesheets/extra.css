@@ -97,3 +97,50 @@
   font-size: .92em;
   padding: .1em .35em;
 }
+
+/* ---------- شارة نوع الملاحظة (note-type chip) ----------
+   يحقنها hook note_types.py قبل سطر الميتاداتا حسب موقع الصفحة:
+   تأمل / لغة / بلاغة / فقه / تجويد / سؤال. */
+.md-typeset .note-type {
+  display: inline-block;
+  font-family: "Cairo", "Noto Naskh Arabic", sans-serif;
+  font-size: .72rem;
+  font-weight: 600;
+  line-height: 1.4;
+  padding: .12em .7em;
+  margin-inline-end: .55em;
+  border-radius: 999px;
+  vertical-align: middle;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+/* تأمّل — لون السمة (تركواز) */
+.md-typeset .note-type--reflection {
+  background: rgba(0, 150, 136, .12);
+  color: var(--md-primary-fg-color);
+  border-color: rgba(0, 150, 136, .35);
+}
+/* لغة/بلاغة — بنفسجي */
+.md-typeset .note-type--linguistic {
+  background: rgba(124, 77, 255, .12);
+  color: #6a3fd6;
+  border-color: rgba(124, 77, 255, .35);
+}
+/* فقه/تجويد — كهرماني */
+.md-typeset .note-type--research {
+  background: rgba(245, 124, 0, .14);
+  color: #b35c00;
+  border-color: rgba(245, 124, 0, .38);
+}
+/* سؤال — أحمر هادئ */
+.md-typeset .note-type--question {
+  background: rgba(229, 57, 53, .12);
+  color: #c62828;
+  border-color: rgba(229, 57, 53, .35);
+}
+
+/* في الوضع الليلي ارفع وضوح النص قليلًا */
+[data-md-color-scheme="slate"] .md-typeset .note-type--linguistic { color: #b39ddf; }
+[data-md-color-scheme="slate"] .md-typeset .note-type--research   { color: #ffb74d; }
+[data-md-color-scheme="slate"] .md-typeset .note-type--question   { color: #ef9a9a; }
