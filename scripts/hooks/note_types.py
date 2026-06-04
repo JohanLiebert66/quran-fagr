@@ -34,20 +34,27 @@ H2_RE = re.compile(r"^##\s+\S")
 NOTE_LINE_RE = re.compile(r"^(\s*)(\*\s*\d{4}-\d{2}-\d{2}\b.*)$")
 FENCE_RE = re.compile(r"^\s*(```|~~~)")
 DATE_RE = re.compile(r"(\d{4})-(\d{2})-(\d{2})")
+TAG_RE = re.compile(r"#([^\s#·)\]*،,]+)")
 _AR_DIGITS = str.maketrans("0123456789", "٠١٢٣٤٥٦٧٨٩")
+
+# صفحة فهرس الوسوم (في surahs/)؛ صفحات الملاحظات تحتها بمستوى واحد ⇒ "../"
+TAGS_INDEX = "الملاحظات-حسب-الوسم.md"
 
 _KHATMAS: list[dict] = []   # سجل الختمات، يُحمَّل مرّة في on_config
 _khatma_for = None          # دالة المطابقة من khatmas_registry
+_tag_anchor = None          # دالة مُعرِّف قسم الوسم من tag_vocabulary
 
 
 def on_config(config):
     """يحمّل سجل الختمات مرّة واحدة عند بدء البناء."""
-    global _KHATMAS, _khatma_for
+    global _KHATMAS, _khatma_for, _tag_anchor
     scripts_dir = Path(__file__).resolve().parent.parent
     if str(scripts_dir) not in sys.path:
         sys.path.insert(0, str(scripts_dir))
     from khatmas_registry import parse_registry, khatma_for
+    from tag_vocabulary import tag_anchor
     _khatma_for = khatma_for
+    _tag_anchor = tag_anchor
     registry = Path(config["docs_dir"]) / "khatmas" / "index.md"
     _KHATMAS = parse_registry(registry)
     return config
@@ -73,6 +80,20 @@ def _date_of(meta_text: str) -> date | None:
         return date(int(m.group(1)), int(m.group(2)), int(m.group(3)))
     except ValueError:
         return None
+
+
+def _linkify_tags(text: str) -> str:
+    """يحوّل #الوسم داخل سطر الميتاداتا إلى رابط لقسمه في فهرس الوسوم."""
+    if _tag_anchor is None:
+        return text
+
+    def repl(m: re.Match) -> str:
+        tag = m.group(1)
+        if tag.startswith("وسم"):          # قالب — لا نربطه
+            return m.group(0)
+        return f"[#{tag}](../{TAGS_INDEX}#{_tag_anchor(tag)})"
+
+    return TAG_RE.sub(repl, text)
 
 
 def on_page_markdown(markdown: str, *, page, config, files) -> str:
@@ -119,7 +140,7 @@ def on_page_markdown(markdown: str, *, page, config, files) -> str:
         badge = ""
         if k:
             badge = f'<span class="note-type note-type--khatma">ختمة {_ar(k["number"])}</span>'
-        lines[i] = f'{m.group(1)}{chip}{badge}{m.group(2)}'
+        lines[i] = f'{m.group(1)}{chip}{badge}{_linkify_tags(m.group(2))}'
 
     if not is_verses:
         return "\n".join(lines)

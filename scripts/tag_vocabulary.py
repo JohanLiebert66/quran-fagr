@@ -48,3 +48,10 @@ VOCABULARY: dict[str, dict[str, str]] = {
 
 # مجموعة مسطّحة بكل الوسوم المعتمدة (لفحص التشابه)
 APPROVED: set[str] = {tag for group in VOCABULARY.values() for tag in group}
+
+
+def tag_anchor(tag: str) -> str:
+    """مُعرِّف ثابت لقسم الوسم في صفحة «الملاحظات حسب الوسم».
+    يستخدمه build_tags_index.py (لكتابة المعرّف) وhook note_types.py
+    (لبناء رابط الشارة) — فلا بدّ أن يكونا متطابقين."""
+    return "وسم-" + tag.strip()
