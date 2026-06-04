@@ -55,6 +55,9 @@ markdown_extensions:
 extra_css:
   - stylesheets/extra.css    # الخطوط العربية + ستايل آيات + لون التشديد
 
+extra_javascript:
+  - javascripts/reading-mode.js   # زرّ «وضع القراءة» العائم
+
 plugins:
   - search:
       lang: ar

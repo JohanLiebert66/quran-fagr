@@ -1,0 +1,27 @@
+name: Validate notes
+
+# يفحص أسطر الميتاداتا في الملاحظات على كل Pull Request قبل الدمج.
+# منفصل عن deploy.yml (الذي يبني وينشر عند الدفع إلى main) حتى لا تُنشَر الـ PRs.
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # validate_notes.py لا يحتاج تبعيات خارجية (مكتبة قياسية + surahs.py محليًا)
+      - name: Validate note metadata
+        run: python scripts/validate_notes.py

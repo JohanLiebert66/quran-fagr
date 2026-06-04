@@ -246,3 +246,36 @@
   padding-top: 0;
   margin-top: 0;
 }
+
+/* ---------- وضع القراءة (reading mode) ----------
+   زرّ عائم (reading-mode.js) يبدّل الصنف reading-mode على <body>. */
+.reading-toggle {
+  position: fixed;
+  bottom: 1.3rem;
+  inset-inline-start: 1.3rem;
+  z-index: 100;
+  width: 3rem;
+  height: 3rem;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: var(--md-primary-fg-color);
+  color: #fff;
+  font-size: 1.35rem;
+  line-height: 3rem;
+  text-align: center;
+  cursor: pointer;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, .28);
+  transition: transform .15s, background .2s;
+}
+.reading-toggle:hover { transform: scale(1.07); }
+.reading-toggle.is-on { background: var(--md-accent-fg-color); }
+
+/* عند تفعيل وضع القراءة: أخفِ التنقّل، وضِّق العمود، وكبّر النص */
+body.reading-mode .md-sidebar,
+body.reading-mode .md-tabs { display: none; }
+
+body.reading-mode .md-main__inner { margin-top: 0; }
+body.reading-mode .md-content { max-width: 46rem; margin: 0 auto; }
+body.reading-mode .md-typeset { font-size: 1.28rem; line-height: 2.15; }
+body.reading-mode .md-typeset blockquote { font-size: 1.45rem; }

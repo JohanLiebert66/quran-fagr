@@ -20,6 +20,7 @@ validate_notes.py — يفحص أسطر الـ metadata في الملاحظات 
 """
 from __future__ import annotations
 
+import difflib
 import re
 import sys
 from datetime import datetime
@@ -33,6 +34,7 @@ except Exception:
 ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT))
 from surahs import BY_NUMBER
+from tag_vocabulary import APPROVED
 
 PROJECT = ROOT.parent
 SURAHS_DIR = PROJECT / "surahs"
@@ -60,6 +62,8 @@ NOTE_LINE_RE = re.compile(r"^\s*\*\s*(\d{4}-\d{2}-\d{2})\b(.*)$")
 LINK_RE = re.compile(r"\[([^\]]*)\]\(([^)]+)\)")
 # مرجع سورة:آية داخل نصّ الرابط — مثل «البقرة:255» أو «البقرة»
 REF_RE = re.compile(r"^\s*(.+?)\s*(?::\s*(\d+))?\s*$")
+# وسم سطري مثل #توحيد أو #آية-الكرسي (نوقف عند الفراغ/الفواصل/نهاية التوكيد)
+TAG_RE = re.compile(r"#([^\s#·)\]*،,]+)")
 
 
 def name_slug(name: str) -> str:
@@ -69,6 +73,18 @@ def name_slug(name: str) -> str:
 
 # اسم السورة (بعد توحيد الشرطات) -> رقمها، للتحقق من تطابق المرجع
 SLUG_TO_NUMBER = {name_slug(name): n for n, name in BY_NUMBER.items()}
+
+
+def _norm_tag(s: str) -> str:
+    """توحيد الهجاء الشائع: ة/ه، ى/ي، ئ/ؤ، والهمزات، لمطابقة المتغيّرات."""
+    for a, b in (("أ", "ا"), ("إ", "ا"), ("آ", "ا"), ("ٱ", "ا"),
+                 ("ة", "ه"), ("ى", "ي"), ("ئ", "ي"), ("ؤ", "و")):
+        s = s.replace(a, b)
+    return s
+
+
+# الصيغة الموحّدة -> الوسم المعتمد، لكشف متغيّرات الهجاء
+NORM_APPROVED = {_norm_tag(t): t for t in APPROVED}
 
 
 def check_link(note_file: Path, text: str, target: str,
@@ -157,6 +173,22 @@ def scan_file(note_file: Path, errors: list, warnings: list) -> int:
         # 2) وسم القالب المنسي
         if "#وسم" in rest:
             warnings.append(f"{rel}:{lineno}  وسم القالب «#وسم» لم يُستبدل")
+
+        # 2b) وسوم تشبه معتمدًا (متغيّر هجاء أو خطأ مرجَّح) — الجديدة تُقبل بصمت
+        for tag in TAG_RE.findall(rest):
+            if tag in APPROVED or tag.startswith("وسم"):
+                continue
+            nt = _norm_tag(tag)
+            if nt in NORM_APPROVED:        # نفس الكلمة بهجاء مختلف
+                warnings.append(
+                    f"{rel}:{lineno}  وسم بهجاء غير موحّد «#{tag}» — استخدم «#{NORM_APPROVED[nt]}»"
+                )
+                continue
+            near = difflib.get_close_matches(nt, list(NORM_APPROVED), n=1, cutoff=0.8)
+            if near:
+                warnings.append(
+                    f"{rel}:{lineno}  وسم غير معتمد «#{tag}» — هل تقصد «#{NORM_APPROVED[near[0]]}»؟"
+                )
 
         # 3) الروابط
         for link_text, target in LINK_RE.findall(rest):
