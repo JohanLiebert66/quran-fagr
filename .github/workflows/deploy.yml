@@ -47,6 +47,7 @@ jobs:
           python scripts/build_whatsnew.py
           python scripts/build_tags_doc.py
           python scripts/build_tags_index.py
+          python scripts/build_ayah_compare.py
 
       - name: Configure git identity
         run: |
