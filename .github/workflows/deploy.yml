@@ -45,6 +45,7 @@ jobs:
           python scripts/build_surah_index.py
           python scripts/build_khatmas.py
           python scripts/build_whatsnew.py
+          python scripts/build_tags_doc.py
 
       - name: Configure git identity
         run: |
