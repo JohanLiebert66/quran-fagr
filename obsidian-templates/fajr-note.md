@@ -1,9 +1,10 @@
 <%*
 // فائدة فجر موضوعية — تُدرَج داخل ملف في surahs/fajr/. الربط بآية اختياري.
 const title = await tp.system.prompt("عنوان الفائدة");
-const tagsRaw = await tp.system.prompt("الوسوم (افصل بمسافة، بلا #)", "");
-const tags = (tagsRaw || "").split(/\s+/).filter(Boolean)
-  .map(t => "#" + t.replace(/^#/, "")).join(" · ");
+const tagsRaw = await tp.system.prompt("الوسوم (افصل بمسافة، ومتعدّد الكلمات بشرطة)", "");
+const tags = (tagsRaw || "").split(/\s+/)
+  .map(t => t.replace(/^#+/, "").trim()).filter(Boolean)
+  .map(t => "#" + t).join(" · ");
 const date = tp.date.now("YYYY-MM-DD");
 let link = "";
 const s = await tp.system.prompt("رقم السورة للربط (اتركه فارغًا إن لم يلزم)", "");
@@ -18,4 +19,3 @@ if (s) {
 const meta = `*${date}${tags ? " · " + tags : ""}${link}*`;
 tR += `## ${title}\n${meta}\n`;
 -%>
-<% tp.file.cursor() %>

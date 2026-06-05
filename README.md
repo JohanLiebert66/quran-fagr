@@ -5,6 +5,26 @@ surah via the **free Gemini API**, save each answer as its own Markdown file
 (number + name), then aggregate the بلاغة/نحو notes and (optionally) export the
 whole thing to a Google Doc.
 
+## Status & features (updated 2026-06)
+
+Surah generation is automated (see the daily task below). The site has since gone
+through a two-phase redesign — all on the existing **MkDocs/Python** stack:
+
+- **Note validation** — `validate_notes.py` checks each note's date, internal links,
+  and surah refs; runs on every pull request (`validate.yml`) **and** before each
+  deploy, so a broken note blocks publishing. It also warns on likely tag typos.
+- **Note-type chips** — every note shows a نوع chip (تأمل / لغة / بلاغة / فقه / تجويد /
+  سؤال) derived from its location, via the MkDocs hook `scripts/hooks/note_types.py`.
+- **Ayah timeline** — verse pages render as a khatmah-aware vertical timeline
+  (ختمة badges + cycle separators).
+- **Tag system** — curated vocabulary page (`معجم الوسوم`), a "notes by tag" index
+  (`الملاحظات حسب الوسم`) with **clickable** tag chips.
+- **Reading mode** — a floating 📖 button toggles a focused, larger-text view.
+- **Cross-khatmah comparison** — `مقارنة التدبر` stacks an ayah's reflections across
+  cycles to compare how understanding evolved.
+- **Authoring** — an Obsidian **Templater** kit in `obsidian-templates/` (offline ayah
+  lookup) writes the exact note format for you. See *Adding a note* below.
+
 ## Pipeline
 
 ```
@@ -32,19 +52,31 @@ quran-fagr/
 ├── fajr-notes.xlsx      ← OPTIONAL Excel input for notes (Markdown editing is recommended)
 ├── logs/                ← daily-task logs (gitignored)
 ├── scripts/
-│   ├── surahs.py        ← the 114 surahs (number + name) — shared reference data
-│   ├── prompt.md        ← the تدبّر question + the fixed output structure (edit freely)
-│   ├── contemplate.py   ← Gemini → one Markdown file per surah (→ surahs/quran/)
-│   ├── aggregate.py     ← collect بلاغة/نحو across surahs (→ surahs/quran/_تجميع-*.md)
-│   ├── build_notes.py   ← OPTIONAL: fajr-notes.xlsx → category pages (overwrites them)
-│   ├── combine.py       ← merge all surahs into one Markdown for Docs export
-│   └── requirements.txt
-└── surahs/              ← MkDocs docs_dir
-    ├── index.md         ← home page
-    ├── tags.md          ← الوسوم — the tag index page
-    ├── .pages           ← top-level nav order (home, تدبر السور, مشاركات الفجر, الوسوم)
-    ├── quran/           ← MAIN SECTION "تدبر السور": 001-*.md … + _تجميع-*.md
-    └── fajr/            ← MAIN SECTION "مشاركات حلقة الفجر": one .md per category (edit these)
+│   ├── surahs.py          ← the 114 surahs (number + name) — shared reference data
+│   ├── prompt.md          ← the تدبّر question + the fixed output structure (edit freely)
+│   ├── contemplate.py     ← Gemini → one Markdown file per surah (→ surahs/quran/)
+│   ├── aggregate.py       ← collect بلاغة/نحو across surahs (→ surahs/quran/_تجميع-*.md)
+│   ├── validate_notes.py  ← validate note metadata (CI gate); warns on tag typos
+│   ├── tag_vocabulary.py  ← approved tags + tag_anchor() (source of truth)
+│   ├── khatmas_registry.py← date → khatmah lookup (shared by hook + builders)
+│   ├── build_surah_index.py / build_khatmas.py / build_whatsnew.py
+│   ├── build_tags_doc.py  ← → معجم-الوسوم.md   build_tags_index.py ← → الملاحظات-حسب-الوسم.md
+│   ├── build_ayah_compare.py ← → مقارنة-التدبر.md (cross-khatmah)
+│   ├── note.py            ← prints a ready metadata line for a note
+│   ├── hooks/note_types.py← MkDocs hook: type/khatmah chips, timeline, tag links
+│   ├── build_notes.py     ← OPTIONAL: fajr-notes.xlsx → category pages (overwrites them)
+│   ├── combine.py / requirements.txt
+├── obsidian-templates/    ← Templater note templates + offline ayah JSON (NOT published)
+└── surahs/                ← MkDocs docs_dir
+    ├── index.md           ← home page
+    ├── tags.md            ← الوسوم — the tag index (Material plugin)
+    ├── معجم-الوسوم.md / الملاحظات-حسب-الوسم.md / مقارنة-التدبر.md  ← generated
+    ├── notes-by-surah.md / whats-new.md  ← generated
+    ├── stylesheets/extra.css   javascripts/reading-mode.js
+    ├── quran/             ← "تدبر السور": 001-*.md … + _تجميع-*.md (generated)
+    ├── fajr/              ← "مشاركات حلقة الفجر": one .md per category (edit these)
+    ├── verses/            ← per-ayah notes: NNN-name.md (timeline pages)
+    └── khatmas/           ← per-khatmah pages (registry in khatmas/index.md)
 ```
 
 ### Site navigation (left sidebar)
@@ -103,6 +135,40 @@ unless `--force`.
 > To finish faster: switch `MODEL` in `contemplate.py` to a model with a larger free
 > allowance (e.g. `gemini-2.5-flash-lite` — check current limits), or enable billing.
 
+## Adding a note — three ways
+
+Every note is one block: a heading (`## آية N` for verse notes, or `## عنوان` for
+fajr notes), an optional ayah quote, a **metadata line**, then your text:
+
+```markdown
+## آية 255:
+> "ٱللَّهُ لَآ إِلَٰهَ إِلَّا هُوَ ٱلْحَىُّ ٱلْقَيُّومُ"
+
+*2026-06-05 · #توحيد · [البقرة:255](../quran/002-البقرة.md)*
+نص التأمّل…
+```
+
+The metadata line is what powers the type chip, ختمة badge, timeline, and tag links,
+so keep its shape: `*التاريخ · #وسوم · [السورة:الآية](../quran/NNN-name.md)*`.
+Multi-word tags: join with a hyphen (e.g. `#حجج-باطلة`). Paste new blocks at the **top**
+(newest first).
+
+**1. Obsidian + Templater — easiest (desktop).** Open the target file in
+`surahs/verses/` or `surahs/fajr/`, run *Templater: Insert template* → `verse-note`,
+and answer surah № / ayah № / tags. The block — including the ayah text from an offline
+copy — is written for you. One-time setup and usage in
+[obsidian-templates/README.md](obsidian-templates/README.md).
+
+**2. GitHub web editor — any device.** On https://github.com/JohanLiebert66/quran-fagr →
+open the file (or **Add file → Create new file** named `NNN-name.md` under
+`surahs/verses/`) → **✏️ Edit** → paste a block in the format above → **Commit**. It's
+validated and auto-deploys in ~2 min. (No Templater on the web, so type the metadata
+line yourself using the shape above.)
+
+**3. Plain Markdown — local.** Edit the file in any editor, then publish (see *Edit any
+page & publish* below). `validate_notes.py` lets you check before pushing:
+`python scripts/validate_notes.py`.
+
 ## Fajr notes — write in Markdown (recommended)
 
 Each category under **مشاركات حلقة الفجر** is a plain Markdown file in `surahs/fajr/`.
@@ -136,8 +202,6 @@ If you'd rather type notes in a spreadsheet, `scripts/build_notes.py` reads `faj
 hand-edited Markdown *or* Excel, not both. (`python build_notes.py --init` creates the
 template; `python build_notes.py` regenerates.) The daily auto-task does **not** run it,
 so your hand-edited notes are safe.
-
-## Display — MkDocs site (chosen)
 
 ## Display — MkDocs site (chosen)
 
@@ -178,9 +242,13 @@ navigate to the file → **✏️ Edit** → write Markdown → **Commit**.
 
 A **GitHub Actions workflow** ([.github/workflows/deploy.yml](.github/workflows/deploy.yml))
 auto-triggers on every push to `main`:
-- Installs deps, runs `aggregate.py` + `build_surah_index.py` + `build_khatmas.py`
-  + `build_whatsnew.py` to refresh derived pages.
+- **Validates notes** (`validate_notes.py`) — a broken date/link/ref fails the build.
+- Refreshes derived pages: `aggregate.py`, `build_surah_index.py`, `build_khatmas.py`,
+  `build_whatsnew.py`, `build_tags_doc.py`, `build_tags_index.py`, `build_ayah_compare.py`.
 - Builds and deploys to `gh-pages`.
+
+A second workflow ([.github/workflows/validate.yml](.github/workflows/validate.yml)) runs
+the note validator on every **pull request**, so problems show up before merging.
 
 So edits from the web editor become live on
 [the site](https://johanliebert66.github.io/quran-fagr/) within ~2 minutes, **no
