@@ -117,6 +117,8 @@ def scan(path: Path, sid: int, haystack: str, results: list) -> int:
 def main() -> None:
     include_fajr = "--include-fajr" in sys.argv
     quran = load_quran()
+    # نفحص مقابل القرآن كاملًا: النموذج يقتبس آياتٍ من سورٍ أخرى عند بيان الترابط
+    all_text = " ".join(quran.values())
 
     total = 0
     issues: list[tuple[str, int, int, str]] = []
@@ -129,7 +131,7 @@ def main() -> None:
         sid = int(m.group(1))
         if sid not in quran:
             continue
-        total += scan(f, sid, quran[sid], issues)
+        total += scan(f, sid, all_text, issues)
 
     # 2) ملفات تدبر الآيات (اسم الملف يحدد السورة)
     if VERSES_DIR.exists():
@@ -142,11 +144,10 @@ def main() -> None:
             sid = int(dm.group(1))
             if sid not in quran:
                 continue
-            total += scan(page, sid, quran[sid], issues)
+            total += scan(page, sid, all_text, issues)
 
-    # 3) (اختياري) ملاحظات الفجر — لا نعرف السورة، نفحص في كامل القرآن
+    # 3) (اختياري) ملاحظات الفجر
     if include_fajr and FAJR_DIR.exists():
-        all_text = " ".join(quran.values())
         for page in FAJR_DIR.glob("*.md"):
             text = page.read_text(encoding="utf-8")
             for ln, line in enumerate(text.split("\n"), 1):

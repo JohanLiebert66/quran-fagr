@@ -66,3 +66,16 @@ importer (and excluded from the daily task so it can't clobber hand edits).
 - Surah/verse: Markdown link `[البقرة](../quran/002-البقرة.md)` → clickable + searchable.
 - Page-level `tags:` frontmatter → listed on the الوسوم index (Material tags plugin, 9.7
   in-page marker `<!-- material/tags -->`, not the deprecated `tags_file`).
+
+## 2026-06-09 — second tadabbur tab + per-surah verses skeletons
+Added a parallel surah-analysis tab **«تدبر السور ٢»** (`surahs/quran2/`) — same
+per-surah-page idea as `quran/` but a different model/source/structure; registered in
+`surahs/.pages` right after `quran`, with `.pages` (title) + placeholder `index.md` so
+the build doesn't break before the 114 files are dropped in. The 114 `NNN-اسم.md`
+files are copied in manually (no badge, like the `quran/` tab).
+Also scaffolded a **skeleton per surah in `surahs/verses/`** (all 114; existing
+002/006/043 preserved) — each file = H1 `NNN — اسم` + an HTML-comment template ready
+to fill, classifying notes by tag: `#تدبر` (تأمل) vs `#سؤال` (سؤال). The Obsidian
+Templater `verse-note.md` now prompts note type (تدبّر/سؤال) and prepends the tag.
+Generator: `scripts/scaffold_new_tab.py` (idempotent, never overwrites). Build passes
+`mkdocs build --strict`.
