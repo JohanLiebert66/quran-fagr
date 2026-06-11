@@ -38,6 +38,11 @@ MODEL = "gemini-3.5-flash"   # نموذج Flash الأحدث؛ بدّله بـ g
 SLEEP_BETWEEN = 5            # ثوانٍ بين الطلبات (الحد المجاني ~15 طلب/دقيقة)
 MAX_RETRIES = 4
 
+# علامة تنسيق البرومبت الحالي (الغني) — تُكتب في الـ frontmatter ويستعملها --upgrade
+# لتمييز السور المُحدَّثة من القديمة. غيّرها عند تغيير بنية prompt.md جوهريًا.
+PROMPT_VERSION = "rich-1"
+RICH_SIGNATURE = "## 🗂️"    # توقيع التنسيق الغني في المتن (لكشف سورٍ غنيّة وُلِّدت قبل العلامة)
+
 SCRIPTS_DIR = Path(__file__).resolve().parent
 PROJECT_DIR = SCRIPTS_DIR.parent
 OUTPUT_DIR = PROJECT_DIR / "surahs" / "quran"   # قسم "تدبر السور" في الموقع
@@ -97,6 +102,7 @@ def save(number: int, name: str, body: str) -> Path:
         f"slug: {number:03d}-{slug(name)}\n"
         f"generated: {today}\n"
         f"model: {MODEL}\n"
+        f"prompt_version: {PROMPT_VERSION}\n"
         "---\n\n"
         f"# {number:03d} — سورة {name}\n\n"
     )
@@ -107,8 +113,28 @@ def save(number: int, name: str, body: str) -> Path:
     return path
 
 
-def parse_args(argv: list[str]) -> tuple[list[int], bool]:
+def is_current(path: Path) -> bool:
+    """هل الملف بالتنسيق الغني الحالي؟ (علامة prompt_version أو توقيع المتن RICH_SIGNATURE)."""
+    try:
+        text = path.read_text(encoding="utf-8")
+    except OSError:
+        return False
+    return f"prompt_version: {PROMPT_VERSION}" in text or RICH_SIGNATURE in text
+
+
+def pending_upgrades() -> list[int]:
+    """السور الموجودة لكنها ليست بالتنسيق الغني الحالي — مرشّحة للترقية."""
+    out = []
+    for n, name in SURAHS:
+        p = out_path(n, name)
+        if p.exists() and not is_current(p):
+            out.append(n)
+    return out
+
+
+def parse_args(argv: list[str]) -> tuple[list[int], bool, bool]:
     force = "--force" in argv
+    upgrade = "--upgrade" in argv
     nums = [a for a in argv if a.lstrip("-").isdigit()]
     if not nums:
         targets = [n for n, _ in SURAHS]
@@ -117,7 +143,7 @@ def parse_args(argv: list[str]) -> tuple[list[int], bool]:
     else:
         lo, hi = int(nums[0]), int(nums[1])
         targets = list(range(lo, hi + 1))
-    return targets, force
+    return targets, force, upgrade
 
 
 def main() -> None:
@@ -128,7 +154,17 @@ def main() -> None:
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     template = PROMPT_FILE.read_text(encoding="utf-8")
     client = genai.Client(api_key=api_key)
-    targets, force = parse_args(sys.argv[1:])
+    targets, force, upgrade = parse_args(sys.argv[1:])
+
+    if upgrade:
+        targets = pending_upgrades()
+        if not targets:
+            print(f"✓ كل السور الموجودة بالتنسيق الغني الحالي ({PROMPT_VERSION}) — لا شيء للترقية.")
+            return
+        force = True   # السور موجودة؛ الترقية تعيد توليدها
+        preview = " ".join(f"{n:03d}" for n in targets[:12])
+        more = f" …(+{len(targets) - 12})" if len(targets) > 12 else ""
+        print(f"↻ ترقية {len(targets)} سورة إلى التنسيق الغني ({PROMPT_VERSION}): {preview}{more}\n")
 
     done = skipped = failed = 0
     stopped = None  # "quota" أو "interrupt"
