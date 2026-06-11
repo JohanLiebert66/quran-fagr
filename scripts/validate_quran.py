@@ -55,8 +55,8 @@ def normalize(s: str) -> str:
     s = s.replace("ٱ", "ا").replace("أ", "ا").replace("إ", "ا").replace("آ", "ا")
     s = s.replace("ى", "ي").replace("ئ", "ي").replace("ؤ", "و")
     s = re.sub(r"[«»\"'()،.:؛؟!ـ]+", " ", s)
-    # علامات نهاية الآية وفواصل الاقتباسات المتعددة وأرقام الآيات المُدرَجة
-    s = re.sub(r"[*۝۞0-9٠-٩]+", " ", s)
+    # علامات نهاية الآية، فواصل الاقتباسات المتعددة، الأقواس المعقوفة، وأرقام الآيات
+    s = re.sub(r"[*۝۞{}0-9٠-٩]+", " ", s)
     s = re.sub(r"\s+", " ", s).strip()
     return s
 
@@ -76,18 +76,21 @@ def load_quran() -> dict[int, str]:
 
 
 QUOTE_RE = re.compile(r'^\s*>\s*(.+?)\s*$')          # سطر اقتباس (كل ما بعد >)
-QUOTED_SPAN_RE = re.compile(r'["«]([^"»]+)["»]')     # نصّ داخل علامتي تنصيص
+QUOTED_SPAN_RE = re.compile(r'["«]([^"»]+)["»]')     # نصّ داخل علامتي تنصيص "..." أو «...»
+BRACE_SPAN_RE = re.compile(r'\{+\s*(.+?)\s*\}+')     # نصّ داخل أقواس معقوفة {{...}} أو {...}
 SURAH_FNAME_RE = re.compile(r"^(\d{3})-(.+)\.md$")
 
 
 def extract_quote(raw: str) -> str:
-    """يستخرج نصّ الآية من سطر اقتباس قد يتبعه مرجع مثل: «النصّ» (البقرة: 2)."""
-    m = QUOTED_SPAN_RE.search(raw)
-    if m:                                  # نصّ بين علامتي تنصيص — خُذه وتجاهل ما بعده
-        return m.group(1).strip()
-    # لا توجد علامات تنصيص: احذف مرجعًا ملحقًا بين قوسين في النهاية
-    raw = re.sub(r"\s*\([^)]*\)\s*$", "", raw)
-    return raw.strip().strip("\"'«»")
+    """يستخرج نصّ الآية من سطر اقتباس بأيٍّ من الصيغ المستعملة:
+    «النصّ» (مرجع) — "النصّ" — *{{النصّ}}* — {النصّ} [مرجع]."""
+    raw = raw.strip().strip("*")            # أزل التوكيد/التظليل المحيط *...*
+    m = QUOTED_SPAN_RE.search(raw) or BRACE_SPAN_RE.search(raw)
+    if m:                                   # محدَّد بعلامات/أقواس — خُذ ما بداخلها وتجاهل المرجع
+        return m.group(1).strip().strip("*")
+    # غير محدَّد: احذف مرجعًا ملحقًا بين قوسين () أو [] في النهاية
+    raw = re.sub(r"\s*[(\[][^)\]]*[)\]]\s*$", "", raw)
+    return raw.strip().strip("\"'«»*{}")
 
 # نعدّ السطر اقتباسًا قرآنيًا إذا كان أغلبه حروفًا عربيّة وطوله معقول
 def looks_quranic(text: str) -> bool:
@@ -101,7 +104,20 @@ def looks_quranic(text: str) -> bool:
 def scan(path: Path, sid: int, haystack: str, results: list) -> int:
     text = path.read_text(encoding="utf-8")
     n = 0
+    in_comment = in_fence = False
     for ln, line in enumerate(text.split("\n"), 1):
+        # تخطّي كتل الكود وتعليقات HTML (قوالب الإدخال والأمثلة توضع فيها)
+        if re.match(r"^\s*(```|~~~)", line):
+            in_fence = not in_fence
+            continue
+        if in_fence:
+            continue
+        if "<!--" in line:
+            in_comment = True
+        if in_comment:
+            if "-->" in line:
+                in_comment = False
+            continue
         m = QUOTE_RE.match(line)
         if not m:
             continue
@@ -146,20 +162,10 @@ def main() -> None:
                 continue
             total += scan(page, sid, all_text, issues)
 
-    # 3) (اختياري) ملاحظات الفجر
+    # 3) (اختياري) ملاحظات الفجر — نفس الفحص في كامل القرآن (sid=0)
     if include_fajr and FAJR_DIR.exists():
         for page in FAJR_DIR.glob("*.md"):
-            text = page.read_text(encoding="utf-8")
-            for ln, line in enumerate(text.split("\n"), 1):
-                m = QUOTE_RE.match(line)
-                if not m:
-                    continue
-                quote = extract_quote(m.group(1))
-                if not looks_quranic(quote):
-                    continue
-                total += 1
-                if normalize(quote) not in all_text:
-                    issues.append((page.relative_to(PROJECT).as_posix(), ln, 0, quote))
+            total += scan(page, 0, all_text, issues)
 
     print(f"✓ فحصتُ {total} اقتباس آية.")
     if not issues:
