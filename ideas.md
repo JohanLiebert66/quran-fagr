@@ -79,3 +79,15 @@ to fill, classifying notes by tag: `#تدبر` (تأمل) vs `#سؤال` (سؤا
 Templater `verse-note.md` now prompts note type (تدبّر/سؤال) and prepends the tag.
 Generator: `scripts/scaffold_new_tab.py` (idempotent, never overwrites). Build passes
 `mkdocs build --strict`.
+
+## 2026-06-11 — «تدبر السور ٢» complete + deploy-workflow correction
+- «تدبر السور ٢» (`surahs/quran2/`) now has all **114 surahs** (2nd model/structure),
+  live alongside the original tab. Files use `NNN_Latin.md` naming; titles come from each
+  file's Arabic H1 so display is unaffected.
+- **Deploy model corrected in docs:** publishing is now **push to `main` → GitHub Actions**
+  (`deploy.yml`), which validates, refreshes derived pages, and force-pushes `gh-pages`.
+  Local `mkdocs gh-deploy` is now REJECTED (Actions owns gh-pages) — README updated to drop
+  it. Source lives on GitHub `main` now (not local-only as originally planned).
+- **Multi-session hazard documented:** 3 sessions + the daily task share one working copy;
+  `git add -A` (incl. the daily commit) sweeps up others' uncommitted work. Recommend
+  disabling `quran-fagr-daily` now that generation is complete; stage specific paths.

@@ -63,6 +63,7 @@ quran-fagr/
 │   ├── build_tags_doc.py  ← → معجم-الوسوم.md   build_tags_index.py ← → الملاحظات-حسب-الوسم.md
 │   ├── build_ayah_compare.py ← → مقارنة-التدبر.md (cross-khatmah)
 │   ├── note.py            ← prints a ready metadata line for a note
+│   ├── scaffold_new_tab.py← one-off: creates quran2/ tab + 114 verses skeletons (idempotent)
 │   ├── hooks/note_types.py← MkDocs hook: type/khatmah chips, timeline, tag links
 │   ├── build_notes.py     ← OPTIONAL: fajr-notes.xlsx → category pages (overwrites them)
 │   ├── combine.py / requirements.txt
@@ -74,8 +75,9 @@ quran-fagr/
     ├── notes-by-surah.md / whats-new.md  ← generated
     ├── stylesheets/extra.css   javascripts/reading-mode.js
     ├── quran/             ← "تدبر السور": 001-*.md … + _تجميع-*.md (generated)
+    ├── quran2/            ← "تدبر السور ٢": NNN_Name.md — parallel analysis, 2nd model/structure
     ├── fajr/              ← "مشاركات حلقة الفجر": one .md per category (edit these)
-    ├── verses/            ← per-ayah notes: NNN-name.md (timeline pages)
+    ├── verses/            ← per-ayah notes: NNN-name.md (114 skeletons; tag #تدبر/#سؤال)
     └── khatmas/           ← per-khatmah pages (registry in khatmas/index.md)
 ```
 
@@ -88,6 +90,8 @@ quran-fagr/
   ├─ … (114 surahs)
   ├─ تجميع: ملاحظات بلاغية
   └─ تجميع: ملاحظات نحوية ولغوية
+تدبر السور ٢                   ← parallel analysis, different model/structure (114 surahs)
+تدبر الآيات                    ← per-verse notes, classified by #تدبر / #سؤال
 مشاركات حلقة الفجر              ← main section (your manual notes)
   ├─ فوائد لغوية                 ← subsection per category
   ├─ فوائد بلاغية
@@ -230,8 +234,9 @@ Every page on the site is a Markdown file under `surahs/`:
 | To change… | Edit this file |
 |------------|----------------|
 | A surah's analysis | `surahs/quran/NNN-name.md` |
+| A surah's analysis (2nd model) | `surahs/quran2/NNN_Name.md` |
 | A Fajr-notes category | `surahs/fajr/<category>.md` |
-| A per-verse note | `surahs/verses/NNN-name.md` (one H2 per verse) |
+| A per-verse note | `surahs/verses/NNN-name.md` (one H2 per verse; tag `#تدبر`/`#سؤال`) |
 | A khatma | the table in `surahs/khatmas/index.md` |
 | The home page | `surahs/index.md` |
 
@@ -254,27 +259,41 @@ So edits from the web editor become live on
 [the site](https://johanliebert66.github.io/quran-fagr/) within ~2 minutes, **no
 local action required**. Status of any run: the repo's **Actions** tab.
 
-### Edit locally — the 3-step flow
+### Edit locally — the flow (publish = push to `main`)
 
 ```powershell
 conda activate quran-fagr
 # 1. edit the .md file(s) …
-python -m mkdocs serve          # 2. (optional) preview at http://127.0.0.1:8000 — live-reloads
-python -m mkdocs gh-deploy --remote-name origin   # 3. publish → live in ~1 min
+python -m mkdocs build --strict   # 2. (optional) check it builds  — or `mkdocs serve` to preview
+git add <specific-paths>          # 3. stage only your files (NOT `git add -A`, see below)
+git commit -m "…"
+git push origin HEAD:main         #    publish → GitHub Actions deploys, live in ~2 min
 ```
 
-- There's no live sync: changes appear online only after `gh-deploy` (local) or after
-  pushing to `main` (GitHub web editor). `mkdocs serve` is a *local* preview that reloads
-  instantly as you type.
+- **Publishing now means pushing to `main`.** The Actions workflow (above) validates,
+  refreshes derived pages, then builds and force-pushes `gh-pages`. There's no live sync;
+  the site updates only after a run finishes (watch the repo's **Actions** tab).
+- ⚠️ **Don't run `mkdocs gh-deploy` locally anymore.** Actions owns `gh-pages` and
+  force-pushes it, so a local `gh-deploy` is rejected with `! [rejected] … (fetch first)`.
+  Use `mkdocs build --strict` / `mkdocs serve` only as local checks/preview.
+- ⚠️ **Multiple sessions / the daily task share one working copy.** Avoid `git add -A` —
+  it sweeps up another session's uncommitted work into your commit. Stage specific paths.
+  The daily task commits to whatever branch is checked out, so keep the working copy on
+  `main` (or disable the task — see below).
 - Hand-edits to surah pages are **safe** — `contemplate.py` skips files that already exist;
   only `contemplate.py --force <n>` regenerates (and overwrites) a surah.
 
 ## Automated daily surah generation
 
+> ✅ **Generation is complete** — all 114 surahs exist in both `surahs/quran/` and
+> `surahs/quran2/`. The daily task is no longer needed; **disable it** to stop it making
+> surprise `daily YYYY-MM-DD` commits (which sweep up uncommitted work across sessions):
+> `Disable-ScheduledTask quran-fagr-daily`.
+
 A Windows Scheduled Task **`quran-fagr-daily`** runs [daily-update.ps1](daily-update.ps1)
 every day at **11:00** (just after the free-tier quota resets ~10:00 Cairo). Each run:
 resumes from the first missing surah → generates ~20 → refreshes the aggregates →
-`gh-deploy`s the site. It **never overwrites** existing surahs.
+publishes the site. It **never overwrites** existing surahs.
 
 - **Catch-up:** if the PC is off at 11:00, it runs as soon as you next log in
   (`StartWhenAvailable`).
@@ -304,13 +323,11 @@ anywhere. Options, easiest first:
    ```
    Great for quick sharing; link lives only while it runs.
 
-3. **Permanent free hosting — GitHub Pages (recommended).** One command publishes the built
-   site to a free public URL `https://<username>.github.io/<repo>/`:
-   ```powershell
-   # one-time: git init, create a GitHub repo, push
-   mkdocs gh-deploy        # builds + pushes to the gh-pages branch
-   ```
-   Re-run `mkdocs gh-deploy` anytime to update. (Free GitHub Pages is **public**.)
+3. **Permanent free hosting — GitHub Pages (already set up here).** The site is published at
+   `https://johanliebert66.github.io/quran-fagr/`, served from the `gh-pages` branch.
+   **Updates are automatic: push to `main` → GitHub Actions builds & deploys** (see *Edit
+   any page & publish* above). The initial `mkdocs gh-deploy` was a one-time bootstrap;
+   don't run it locally now (Actions owns `gh-pages`). (Free GitHub Pages is **public**.)
 
    Alternatives in the same vein: **Cloudflare Pages** / **Netlify** (connect the repo, auto-build
    on push, free, custom domain optional).
