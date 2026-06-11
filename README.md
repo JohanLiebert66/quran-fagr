@@ -124,6 +124,7 @@ python contemplate.py            # all surahs not done yet (auto-resume)
 python contemplate.py 18         # just surah 18 (الكهف)
 python contemplate.py 1 10       # surahs 1–10
 python contemplate.py --force 2  # regenerate surah 2 even if it exists
+python contemplate.py --upgrade  # regenerate ONLY surahs not yet in the rich prompt format (resumable)
 
 python aggregate.py              # build the بلاغة + نحو master files
 python combine.py                # build _combined.md for the Docs export
@@ -138,6 +139,24 @@ unless `--force`.
 > detects the daily-quota 429, so no pointless retries) and tells you to resume later.
 > To finish faster: switch `MODEL` in `contemplate.py` to a model with a larger free
 > allowance (e.g. `gemini-2.5-flash-lite` — check current limits), or enable billing.
+
+### Upgrading older surahs to the rich format
+
+`prompt.md` is now the **rich «Al-Kahf» format** (thematic title + معلومات-السورة table +
+key-vocab table + axis stops with لغوية/بلاغية pauses). To bring older surahs up to it
+without re-doing the ones already converted:
+
+```powershell
+python scripts\contemplate.py --upgrade
+```
+
+It regenerates **only** surahs not yet in the rich format — detected by the
+`prompt_version: rich-1` front-matter marker (or the `## 🗂️` heading, for ones converted
+before the marker existed). It overwrites those surahs in `quran/`, stops on the daily
+quota, and is **resumable** (re-run to continue). This is wired into `daily-update.ps1`,
+so the rollout runs automatically (~6 days) then goes quiet. Current `MODEL` is
+`gemini-3.5-flash`; switch it to `gemini-3.1-pro-preview` first for deeper flagship surahs.
+`validate_quran.py` (warning-only) understands the rich quote boxes and flags any real misquotes.
 
 ## Adding a note — three ways
 
