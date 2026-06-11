@@ -17,7 +17,8 @@ Set-Location $proj
 # اسحب تحريرات الموقع من GitHub أولًا (محرّر الويب على الهاتف، إلخ)
 git pull --rebase origin main 2>&1 | Tee-Object -FilePath $log -Append
 
-& $py "scripts\contemplate.py"       | Tee-Object -FilePath $log -Append   # ~20 سورة/يوم ثم يتوقف
+& $py "scripts\contemplate.py"           | Tee-Object -FilePath $log -Append   # توليد أي سورة ناقصة (إن وُجدت)
+& $py "scripts\contemplate.py" --upgrade | Tee-Object -FilePath $log -Append   # ترقية دفعة إلى التنسيق الغني (rich) حتى نفاد الحصة اليومية
 & $py "scripts\aggregate.py"         | Tee-Object -FilePath $log -Append   # تحديث تجميع بلاغة/نحو
 & $py "scripts\build_surah_index.py" | Tee-Object -FilePath $log -Append   # فهرس الملاحظات حسب السورة
 & $py "scripts\build_khatmas.py"     | Tee-Object -FilePath $log -Append   # صفحات الختمات
