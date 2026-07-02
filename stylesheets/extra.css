@@ -1,0 +1,281 @@
+/* خطوط عربية احترافية بأوزان حقيقية (Bold/Regular) من Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;500;700&family=Cairo:wght@500;600;700&family=Amiri:wght@400;700&display=swap');
+
+/* ---------- الخطوط الافتراضية للموقع ---------- */
+:root {
+  --md-text-font-family: "Noto Naskh Arabic", "Cairo", system-ui, "Segoe UI", sans-serif;
+  --md-code-font-family: "JetBrains Mono", "Roboto Mono", Consolas, monospace;
+}
+
+/* النص الأساسي: تكبير المقاس ومساحة بين الأسطر لراحة قراءة العربية */
+.md-typeset {
+  font-family: var(--md-text-font-family);
+  font-size: 1.05rem;       /* ~16.8px — أوضح مع الحركات */
+  line-height: 1.95;
+}
+
+/* العناوين: Cairo بوزن سميك يعطي ثقلًا واضحًا، مع تكبير ملحوظ */
+.md-typeset h1, .md-typeset h2, .md-typeset h3,
+.md-typeset h4, .md-typeset h5, .md-typeset h6 {
+  font-family: "Cairo", "Noto Naskh Arabic", sans-serif;
+  font-weight: 700;
+  line-height: 1.4;
+}
+.md-typeset h1 { font-size: 2.1rem; margin-top: .8em; }
+.md-typeset h2 { font-size: 1.65rem; margin-top: 1.8em; }
+.md-typeset h3 { font-size: 1.3rem;  margin-top: 1.4em; }
+.md-typeset h4 { font-size: 1.1rem;  margin-top: 1.2em; }
+
+/* رمز رابط المشاركة بجوار كل عنوان — مرئي دائمًا بشكل خفيف، واضح عند المرور */
+.md-typeset .headerlink {
+  opacity: 0.35;
+  margin-inline-start: 0.5em;
+  font-size: 0.7em;
+  color: var(--md-accent-fg-color);
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+.md-typeset h1:hover .headerlink,
+.md-typeset h2:hover .headerlink,
+.md-typeset h3:hover .headerlink,
+.md-typeset h4:hover .headerlink,
+.md-typeset .headerlink:hover { opacity: 1; }
+
+/* الواجهة (الشريط الجانبي والعلوي): خط نظيف بأوزان واضحة */
+.md-nav, .md-tabs, .md-header, .md-footer {
+  font-family: "Cairo", "Noto Naskh Arabic", sans-serif;
+}
+
+/* ---------- تنسيقات الـ Markdown ----------
+   العربية ليس لها مائل (italic) حقيقي، فنُحوّل *النص* إلى لون مميّز + وزن أثقل
+   حتى يظهر فعليًا بدل أن يبدو كنص عادي. */
+.md-typeset em {
+  font-style: normal;
+  color: var(--md-accent-fg-color);
+  font-weight: 500;
+}
+
+/* **نص** يظهر بوزن سميك حقيقي (700) من الخط المحمَّل */
+.md-typeset strong {
+  font-weight: 700;
+  color: var(--md-default-fg-color);
+}
+
+/* ==نص== للتظليل (يحتاج pymdownx.mark) */
+.md-typeset mark {
+  background: rgba(255, 213, 79, .55);
+  padding: 0 .25em;
+  border-radius: 3px;
+}
+
+/* ~~شطب~~ */
+.md-typeset del { text-decoration: line-through; opacity: .75; }
+
+/* ---------- إبراز الآيات: استخدم > "..." (Blockquote) ----------
+   صندوق بإطار جانبي ولون خفيف ومسافة مريحة، وخط أميري المخصّص للقرآن */
+.md-typeset blockquote {
+  border-right: 4px solid var(--md-primary-fg-color);
+  border-left: none;
+  background: rgba(0, 150, 136, .07);
+  padding: 1em 1.4em;
+  border-radius: 6px;
+  margin: 1.2em 0;
+  font-family: "Amiri", "Noto Naskh Arabic", serif;
+  font-size: 1.2rem;
+  color: var(--md-default-fg-color);
+}
+.md-typeset blockquote > :first-child { margin-top: 0; }
+.md-typeset blockquote > :last-child  { margin-bottom: 0; }
+
+/* عرض أوسع للقراءة المريحة */
+.md-grid { max-width: 1280px; }
+
+/* أرقام الآيات وأرقام السور تبقى بأرقام عربية مغربية أو هندية حسب الخط — تركها لِما يختاره النص */
+
+/* تحسين شكل الأكواد المضمَّنة */
+.md-typeset code {
+  font-size: .92em;
+  padding: .1em .35em;
+}
+
+/* ---------- شارة نوع الملاحظة (note-type chip) ----------
+   يحقنها hook note_types.py قبل سطر الميتاداتا حسب موقع الصفحة:
+   تأمل / لغة / بلاغة / فقه / تجويد / سؤال. */
+.md-typeset .note-type {
+  display: inline-block;
+  font-family: "Cairo", "Noto Naskh Arabic", sans-serif;
+  font-size: .72rem;
+  font-weight: 600;
+  line-height: 1.4;
+  padding: .12em .7em;
+  margin-inline-end: .55em;
+  border-radius: 999px;
+  vertical-align: middle;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+/* تأمّل — لون السمة (تركواز) */
+.md-typeset .note-type--reflection {
+  background: rgba(0, 150, 136, .12);
+  color: var(--md-primary-fg-color);
+  border-color: rgba(0, 150, 136, .35);
+}
+/* لغة/بلاغة — بنفسجي */
+.md-typeset .note-type--linguistic {
+  background: rgba(124, 77, 255, .12);
+  color: #6a3fd6;
+  border-color: rgba(124, 77, 255, .35);
+}
+/* فقه/تجويد — كهرماني */
+.md-typeset .note-type--research {
+  background: rgba(245, 124, 0, .14);
+  color: #b35c00;
+  border-color: rgba(245, 124, 0, .38);
+}
+/* سؤال — أحمر هادئ */
+.md-typeset .note-type--question {
+  background: rgba(229, 57, 53, .12);
+  color: #c62828;
+  border-color: rgba(229, 57, 53, .35);
+}
+
+/* في الوضع الليلي ارفع وضوح النص قليلًا */
+[data-md-color-scheme="slate"] .md-typeset .note-type--linguistic { color: #b39ddf; }
+[data-md-color-scheme="slate"] .md-typeset .note-type--research   { color: #ffb74d; }
+[data-md-color-scheme="slate"] .md-typeset .note-type--question   { color: #ef9a9a; }
+
+/* ---------- تخطيط بطاقة الملاحظة (note card) ----------
+   يُطبَّق فقط على صفحات الملاحظات (التي تحوي شارة .note-type)،
+   فلا يمسّ صفحات تدبر السور المُولَّدة. كل ملاحظة = عنوان H2 يفصله خط
+   علوي، يليه سطر ميتاداتا بشكل شريط بطاقة خفيف. */
+
+/* فاصل علوي وعنوان بارز لكل ملاحظة */
+.md-typeset:has(.note-type) h2 {
+  margin-top: 2.6em;
+  padding-top: 1.1em;
+  border-top: 1px solid var(--md-default-fg-color--lightest);
+}
+.md-typeset:has(.note-type) h2:first-of-type {
+  border-top: none;
+  padding-top: 0;
+  margin-top: 1em;
+}
+
+/* سطر الميتاداتا (يحوي الشارة) كشريط بطاقة خفيف أسفل العنوان مباشرة */
+.md-typeset p:has(.note-type) {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .25em .1em;
+  margin-top: .35em;
+  padding: .45em .85em;
+  background: var(--md-default-fg-color--lightest);
+  border-radius: 8px;
+}
+/* نصّ الميتاداتا داخل الشريط: مكتوم بدل لون السمة الافتراضي للـ em */
+.md-typeset p:has(.note-type) em {
+  font-style: normal;
+  font-weight: 500;
+  color: var(--md-default-fg-color--light);
+}
+
+/* رِفّ جانبي ملوّن حسب نوع الملاحظة (border منطقي يحترم RTL) */
+.md-typeset p:has(.note-type--reflection) { border-inline-start: 3px solid var(--md-primary-fg-color); }
+.md-typeset p:has(.note-type--linguistic) { border-inline-start: 3px solid #7c4dff; }
+.md-typeset p:has(.note-type--research)   { border-inline-start: 3px solid #f57c00; }
+.md-typeset p:has(.note-type--question)   { border-inline-start: 3px solid #e53935; }
+
+/* شارة الختمة — محايدة ومُحدَّدة بإطار فقط، تمييزًا لها عن شارة النوع */
+.md-typeset .note-type--khatma {
+  background: transparent;
+  color: var(--md-default-fg-color--light);
+  border-color: var(--md-default-fg-color--lighter);
+}
+
+/* ---------- الخط الزمني للآيات (verses timeline) ----------
+   يلفّ hook note_types.py كل ملاحظة في .tl-note ويُدرِج .tl-sep عند تغيّر
+   الختمة؛ هنا نرسم الخط الرأسي والنقاط. */
+
+/* فاصل الختمة بين مجموعات الملاحظات */
+.md-typeset .tl-sep {
+  font-family: "Cairo", "Noto Naskh Arabic", sans-serif;
+  font-weight: 700;
+  font-size: .95rem;
+  color: var(--md-primary-fg-color);
+  margin: 2.6em 0 1em;
+  padding-bottom: .4em;
+  border-bottom: 2px solid var(--md-default-fg-color--lightest);
+}
+
+/* بطاقة ملاحظة على الريل الزمني */
+.md-typeset .tl-note {
+  position: relative;
+  padding-inline-start: 1.6rem;
+}
+/* الخط العمودي المستمر (يمتد لأسفل ليصل بالبطاقة التالية) */
+.md-typeset .tl-note::before {
+  content: "";
+  position: absolute;
+  inset-inline-start: .42rem;
+  top: .2rem;
+  bottom: -1.2rem;
+  width: 2px;
+  background: var(--md-default-fg-color--lightest);
+}
+.md-typeset .tl-note:last-child::before { bottom: auto; height: 1.7rem; }
+/* النقطة على الخط، بمحاذاة عنوان الملاحظة */
+.md-typeset .tl-note::after {
+  content: "";
+  position: absolute;
+  inset-inline-start: 0;
+  top: .8rem;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: var(--md-primary-fg-color);
+  border: 3px solid var(--md-default-bg-color);
+}
+.md-typeset .tl-note--linguistic::after { background: #7c4dff; }
+.md-typeset .tl-note--research::after   { background: #f57c00; }
+.md-typeset .tl-note--question::after   { background: #e53935; }
+
+/* داخل بطاقة الريل: الريل يكفي للفصل، فألغِ الفاصل العلوي للعنوان */
+.md-typeset .tl-note h2 {
+  border-top: none;
+  padding-top: 0;
+  margin-top: 0;
+}
+
+/* ---------- وضع القراءة (reading mode) ----------
+   زرّ عائم (reading-mode.js) يبدّل الصنف reading-mode على <body>. */
+.reading-toggle {
+  position: fixed;
+  bottom: 1.3rem;
+  inset-inline-start: 1.3rem;
+  z-index: 100;
+  width: 3rem;
+  height: 3rem;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: var(--md-primary-fg-color);
+  color: #fff;
+  font-size: 1.35rem;
+  line-height: 3rem;
+  text-align: center;
+  cursor: pointer;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, .28);
+  transition: transform .15s, background .2s;
+}
+.reading-toggle:hover { transform: scale(1.07); }
+.reading-toggle.is-on { background: var(--md-accent-fg-color); }
+
+/* عند تفعيل وضع القراءة: أخفِ التنقّل، وضِّق العمود، وكبّر النص */
+body.reading-mode .md-sidebar,
+body.reading-mode .md-tabs { display: none; }
+
+body.reading-mode .md-main__inner { margin-top: 0; }
+body.reading-mode .md-content { max-width: 46rem; margin: 0 auto; }
+body.reading-mode .md-typeset { font-size: 1.28rem; line-height: 2.15; }
+body.reading-mode .md-typeset blockquote { font-size: 1.45rem; }
