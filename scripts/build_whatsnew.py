@@ -47,8 +47,15 @@ def collect() -> list[dict]:
             if page.name == "index.md":
                 continue
             text = page.read_text(encoding="utf-8")
+            text = re.sub(r"<!--.*?-->", "", text, flags=re.DOTALL)
+            text = re.sub(r"```.*?```", "", text, flags=re.DOTALL)
             heads = list(HEAD_RE.finditer(text))
             for i, h in enumerate(heads):
+                raw_head = h.group(1).strip()
+                id_m = re.search(r"\{:\s*#([^\s}]+)\s*\}", raw_head)
+                anchor = id_m.group(1) if id_m else ""
+                clean_title = re.sub(r"\{:\s*#([^\s}]+)\s*\}", "", raw_head).strip()
+
                 seg_end = heads[i + 1].start() if i + 1 < len(heads) else len(text)
                 segment = text[h.end():seg_end]
                 lines = segment.lstrip().split("\n", 5)
@@ -58,10 +65,17 @@ def collect() -> list[dict]:
                         if dm:
                             y, mo, da = int(dm.group(1)), int(dm.group(2)), int(dm.group(3))
                             label = "تدبر آية" if d_dir.name == "verses" else "مشاركات الفجر"
+
+                            ayah_m = re.search(r"آية\s*(\d+)", clean_title)
+                            if not anchor and ayah_m and d_dir.name == "verses":
+                                anchor = ayah_m.group(1)
+
+                            rel = page.relative_to(SURAHS).as_posix()
+                            rel_with_anchor = f"{rel}#{anchor}" if anchor else rel
                             items.append({
                                 "date": date(y, mo, da),
-                                "title": h.group(1).strip(),
-                                "rel": page.relative_to(SURAHS).as_posix(),
+                                "title": clean_title,
+                                "rel": rel_with_anchor,
                                 "label": label,
                             })
                             break

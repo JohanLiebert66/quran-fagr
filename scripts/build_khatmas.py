@@ -55,6 +55,8 @@ def collect_notes() -> list[dict]:
                 text = page.read_text(encoding="utf-8")
             except Exception:
                 continue
+            text = re.sub(r"<!--.*?-->", "", text, flags=re.DOTALL)
+            text = re.sub(r"```.*?```", "", text, flags=re.DOTALL)
             # remove frontmatter
             if text.startswith("---"):
                 end = text.find("\n---", 3)
@@ -72,6 +74,11 @@ def collect_notes() -> list[dict]:
                 surah_num = 999
                 surah_name = "مشاركات عامة"
                 ayah_num = 0
+
+                raw_head = h.group(1).strip()
+                id_m = re.search(r"\{:\s*#([^\s}]+)\s*\}", raw_head)
+                anchor = id_m.group(1) if id_m else ""
+                clean_title = re.sub(r"\{:\s*#([^\s}]+)\s*\}", "", raw_head).strip()
 
                 for j, line in enumerate(lines[:5]):
                     mm = DATE_RE.search(line)
@@ -102,9 +109,12 @@ def collect_notes() -> list[dict]:
                     if fn[:3].isdigit():
                         surah_num = int(fn[:3])
                         surah_name = BY_NUMBER.get(surah_num, fn[4:])
-                    am = AYAH_TITLE_RE.search(h.group(1))
+                    am = AYAH_TITLE_RE.search(clean_title)
                     if am:
                         ayah_num = int(am.group(1))
+
+                if not anchor and ayah_num and page.parent.name == "verses":
+                    anchor = str(ayah_num)
 
                 rel = page.relative_to(SURAHS).as_posix()
                 label = page.relative_to(SURAHS).parts[0]   # "fajr" أو "verses"
@@ -112,8 +122,9 @@ def collect_notes() -> list[dict]:
                 out.append({
                     "date": dt,
                     "rel": rel,
+                    "anchor": anchor,
                     "label": label_ar,
-                    "title": h.group(1).strip(),
+                    "title": clean_title,
                     "snippet": snippet,
                     "surah_num": surah_num,
                     "surah_name": surah_name,
@@ -168,7 +179,8 @@ def write_khatma_page(k: dict, notes: list[dict]) -> Path:
                 )
 
                 for n in s_notes:
-                    link = f"../{n['rel']}"
+                    anchor_part = f"#{n['anchor']}" if n.get("anchor") else ""
+                    link = f"../{n['rel']}{anchor_part}"
                     lines.append(f"- **[{n['title']}]({link})** — *{n['label']}*")
                     if n["snippet"]:
                         lines.append(f"    - {n['snippet']}")

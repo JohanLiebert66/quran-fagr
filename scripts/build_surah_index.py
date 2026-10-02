@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 build_surah_index.py — يُولّد فهرسًا عكسيًا: لكل سورة وردت في الملاحظات،
-قائمة الإدخالات التي تشير إليها.
+قائمة الإدخالات التي تشير إليها مع روابط مباشرة للملاحظات (Anchors).
 
 يجمع من مصدرين:
 1. مشاركات حلقة الفجر (`surahs/fajr/*.md`):
@@ -29,26 +29,49 @@ OUT = PROJECT / "surahs" / "notes-by-surah.md"
 
 LINK_RE = re.compile(r"\[([^\]]+)\]\(\.\./quran/(\d{3}-[^\)]+)\.md\)")
 HEAD_RE = re.compile(r"^##\s+(.+?)\s*$", re.MULTILINE)
+H3_RE = re.compile(r"^###\s+(.+?)\s*$", re.MULTILINE)
+ATTR_ID_RE = re.compile(r"\{:\s*#([^\s}]+)\s*\}")
+AYAH_RE = re.compile(r"آية\s*(\d+)")
 VERSES_FILE_RE = re.compile(r"^(\d{3}-[^.]+)\.md$")
 
 
+def clean_text_content(text: str) -> str:
+    """إزالة التعليقات وكتل الكود لتجنب فهرسة قوالب الإدخال والأمثلة."""
+    text = re.sub(r"<!--.*?-->", "", text, flags=re.DOTALL)
+    text = re.sub(r"```.*?```", "", text, flags=re.DOTALL)
+    return text
+
+
 def main() -> None:
-    # كل إدخال: (المسار النسبي للصفحة، عنوان الإدخال، تسمية المصدر، مرجع إضافي اختياري)
+    # كل إدخال: (المسار النسبي للصفحة مع الـ anchor، عنوان الإدخال، تسمية المصدر، مرجع إضافي اختياري)
     by_surah: dict[str, list[tuple[str, str, str, str]]] = {}
 
     # ===== 1) فحص ملاحظات الفجر بحثًا عن روابط لصفحات السور =====
     if FAJR.exists():
         for page in sorted(FAJR.glob("*.md")):
-            text = page.read_text(encoding="utf-8")
+            if page.name == "index.md":
+                continue
+            raw_text = page.read_text(encoding="utf-8")
+            text = clean_text_content(raw_text)
+
             heads = [(m.start(), m.group(1).strip()) for m in HEAD_RE.finditer(text)]
             for m in LINK_RE.finditer(text):
                 link_text = m.group(1).strip()
                 surah_slug = m.group(2)
                 preceding = [h for h in heads if h[0] < m.start()]
-                note_title = preceding[-1][1] if preceding else "(بدون عنوان)"
+                if not preceding:
+                    continue
+                raw_head = preceding[-1][1]
+
+                # استخراج المعرف الصريح {: #id } إن وُجد
+                id_m = ATTR_ID_RE.search(raw_head)
+                anchor = id_m.group(1) if id_m else ""
+                clean_title = ATTR_ID_RE.sub("", raw_head).strip()
+
+                src_rel = f"fajr/{page.stem}.md#{anchor}" if anchor else f"fajr/{page.stem}.md"
                 by_surah.setdefault(surah_slug, []).append((
-                    f"fajr/{page.stem}.md",
-                    note_title,
+                    src_rel,
+                    clean_title,
                     page.stem,
                     link_text,
                 ))
@@ -62,12 +85,44 @@ def main() -> None:
             if not m:
                 continue
             surah_slug = m.group(1)
-            text = page.read_text(encoding="utf-8")
-            for h in HEAD_RE.finditer(text):
-                verse_title = h.group(1).strip()
+            raw_text = page.read_text(encoding="utf-8")
+            text = clean_text_content(raw_text)
+
+            heads = list(HEAD_RE.finditer(text))
+            for i, h in enumerate(heads):
+                raw = h.group(1).strip()
+                sec_end = heads[i + 1].start() if i + 1 < len(heads) else len(text)
+                sec_text = text[h.end():sec_end]
+
+                id_m = ATTR_ID_RE.search(raw)
+                ayah_m = AYAH_RE.search(raw)
+
+                anchor = ""
+                if id_m:
+                    anchor = id_m.group(1)
+                    raw = ATTR_ID_RE.sub("", raw).strip()
+                elif ayah_m:
+                    anchor = ayah_m.group(1)
+
+                h3_m = H3_RE.search(sec_text)
+                title = raw
+                if ayah_m:
+                    ayah_num = ayah_m.group(1)
+                    # إزالة مطلع "آية N:" إذا كان موجوداً لاستخلاص النص الفرعي
+                    cleaned_raw = re.sub(r"^آية\s*\d+\s*[:\-—]?\s*", "", raw).strip()
+                    if cleaned_raw:
+                        title = f"آية {ayah_num}: {cleaned_raw}"
+                    elif h3_m:
+                        sub = h3_m.group(1).strip()
+                        sub = ATTR_ID_RE.sub("", sub).strip()
+                        title = f"آية {ayah_num}: {sub}"
+                    else:
+                        title = f"آية {ayah_num}"
+
+                src_rel = f"verses/{page.stem}.md#{anchor}" if anchor else f"verses/{page.stem}.md"
                 by_surah.setdefault(surah_slug, []).append((
-                    f"verses/{page.stem}.md",
-                    verse_title,
+                    src_rel,
+                    title,
                     "تدبر آية",
                     "",
                 ))
@@ -78,7 +133,7 @@ def main() -> None:
     lines = [
         "# فهرس الملاحظات حسب السورة\n",
         "تجميعٌ تلقائي: لكل سورة وردت في **مشاركات حلقة الفجر** أو في **تدبر الآيات**، "
-        "قائمة الملاحظات التي تخصّها.\n",
+        "قائمة الملاحظات التي تخصّها مع روابط مباشرة لكل آية وفائدة.\n",
         "للإضافة: اكتب رابطًا مثل `[البقرة:255](../quran/002-البقرة.md)` في ملاحظة فجر، "
         "أو أنشئ/حدّث ملف `surahs/verses/NNN-name.md` وأضف عنوان `## آية N: ...`.\n",
     ]
