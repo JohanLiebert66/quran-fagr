@@ -37,6 +37,7 @@ theme:
 markdown_extensions:
   - toc:
       permalink: "🔗"          # رمز "نسخ رابط القسم" يظهر بجوار كل عنوان للمشاركة المباشرة
+      toc_depth: 3             # يقتصر على مستوى الآيات (H2) وعناوين التدبرات (H3)
   - admonition
   - tables
   - attr_list
