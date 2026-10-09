@@ -1,10 +1,10 @@
 nav:
   - الرئيسية: index.md
   - الجديد: whats-new.md
-  - quran
-  - quran2
   - verses
   - khatmas
+  - quran
+  - quran2
   - fajr
   - فهرس حسب السورة: notes-by-surah.md
   - الوسوم: tags.md

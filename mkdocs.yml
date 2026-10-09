@@ -58,6 +58,7 @@ extra_css:
 
 extra_javascript:
   - javascripts/reading-mode.js   # زرّ «وضع القراءة» العائم
+  - javascripts/surah-nav.js      # فتح جدول محتويات السورة تلقائيًا على الجوال وتسهيل التنقل بين الآيات
 
 plugins:
   - search:
