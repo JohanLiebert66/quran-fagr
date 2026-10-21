@@ -10,6 +10,7 @@ validate_notes.py — يفحص أسطر الـ metadata في الملاحظات 
     • تاريخ غير صالح في بداية السطر (يجب أن يكون YYYY-MM-DD صحيحًا).
     • رابط داخلي مكسور: ملف .md مشار إليه غير موجود.
     • تعارُض المرجع: نصّ الرابط يقول «البقرة» لكنه يشير إلى ملف سورة أخرى.
+    • ترتيب الآيات داخل surahs/verses/*.md غير تصاعدي بحسب رقم الآية.
   تحذيرات (لا توقِف النشر):
     • رقم آية خارج نطاق السورة.
     • وسم القالب «#وسم» نُسي في ملاحظة حقيقية.
@@ -196,6 +197,32 @@ def scan_file(note_file: Path, errors: list, warnings: list) -> int:
     return n
 
 
+def check_verse_order(errors: list[str]) -> None:
+    """يتحقق من أن الآيات داخل كل ملف في surahs/verses مرتبة تصاعدياً برقم الآية."""
+    verses_dir = SURAHS_DIR / "verses"
+    if not verses_dir.exists():
+        return
+    for f in sorted(verses_dir.glob("*.md")):
+        rel = f.relative_to(PROJECT).as_posix()
+        try:
+            content = f.read_text(encoding="utf-8")
+        except Exception:
+            continue
+        headings = [l for l in content.splitlines() if l.startswith("## ")]
+        prev_num = -1
+        prev_heading = ""
+        for h in headings:
+            m = re.search(r"آي[ا|ة|ات]*\s*(\d+)", h)
+            if m:
+                num = int(m.group(1))
+                if num < prev_num:
+                    errors.append(
+                        f"{rel}  ترتيب الآيات غير تصاعدي: العنوان «{h.strip()}» (آية {num}) جاء بعد «{prev_heading}» (آية {prev_num}) — يجب الترتيب تصاعدياً بأرقام الآيات"
+                    )
+                prev_num = num
+                prev_heading = h.strip()
+
+
 def main() -> None:
     strict = "--strict" in sys.argv
     errors: list[str] = []
@@ -204,6 +231,8 @@ def main() -> None:
 
     for f in sorted(SURAHS_DIR.rglob("*.md")):
         total += scan_file(f, errors, warnings)
+
+    check_verse_order(errors)
 
     print(f"✓ فحصتُ {total} سطر ملاحظة في {SURAHS_DIR.name}/.")
 
