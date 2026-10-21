@@ -110,3 +110,14 @@ without overwriting blindly or busting the free quota:
 - Model is `gemini-3.5-flash`; switch `MODEL` to `gemini-3.1-pro-preview` before runs for
   deeper flagship surahs. (A/B on البقرة: rich format is more concise + cited; quote
   fidelity needs the validator as a safety net.)
+
+
+## 2026-10-21 — plan: integrate Vane (AI search engine) for grounded, hallucination-free tafsir
+- **Goal:** Limit LLM hallucinations and restrict search sources to vetted, authoritative Islamic and Arabic lexicographical sources (Tafsir at-Tabari, as-Sa'di, al-Wasit by Tantawi, Lisan al-Arab, Dorar.net).
+- **Core Technology:** [ItzCrazyKns/Vane](https://github.com/ItzCrazyKns/Vane) (formerly Perplexica), an open-source, privacy-first AI answer engine backed by SearXNG, local/cloud LLMs (Ollama / Gemini), and vector search.
+- **Key Enhancements Proposed:**
+  1. Custom `Quranic Tafsir` Focus Mode with domain whitelisting (`tafsir.app`, `shamela.ws`, `dorar.net`, `almaany.com`).
+  2. Local RAG ingestion of primary tafsir and lexicon volumes (offline, zero-token cost).
+  3. Integration helper script (`scripts/search_tafsir.py`) for live session querying and verification.
+  4. Pre-commit citation validation to verify quotes before shipping.
+- **Detailed Plan & Architecture:** See full engineering document at [`docs/plans/vane-search-integration.md`](docs/plans/vane-search-integration.md).
