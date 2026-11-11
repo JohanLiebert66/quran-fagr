@@ -5,6 +5,7 @@ fagr.docx
 logs/
 scripts/data/
 data/tafsir/
+data/hadith/
 .obsidian/
 __pycache__/
 *.pyc
