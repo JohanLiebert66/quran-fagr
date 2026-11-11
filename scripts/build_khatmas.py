@@ -2,7 +2,7 @@
 """
 build_khatmas.py — يُنشئ صفحة لكل ختمة في `surahs/khatmas/` تجمع الملاحظات
 (من تدبر الآيات ومشاركات حلقة الفجر) مقسمة هيكلياً:
-اليوم (الجلسة) -> السورة (بترتيب المصحف) -> الآيات تصاعدياً.
+اليوم (الجلسة تنازلياً: الأحدث أولاً) -> السورة (بترتيب المصحف) -> الآيات تصاعدياً.
 
 التشغيل:
     python build_khatmas.py
@@ -152,8 +152,8 @@ def write_khatma_page(k: dict, notes: list[dict]) -> Path:
         lines.append("")
         lines.append("*لا توجد ملاحظات في هذه المدّة بعد.*")
     else:
-        # ترتيب الأيام زمنياً (تصاعدياً مع سير الختمة من الفاتحة إلى الناس)
-        unique_dates = sorted(set(n["date"] for n in notes))
+        # ترتيب الأيام زمنياً تنازلياً (الأحدث أولاً في أعلى الصفحة لسهولة الوصول)
+        unique_dates = sorted(set(n["date"] for n in notes), reverse=True)
         for d in unique_dates:
             day_notes = [n for n in notes if n["date"] == d]
             lines.append(f"## 🗓 جلسة: {d.isoformat()}")
