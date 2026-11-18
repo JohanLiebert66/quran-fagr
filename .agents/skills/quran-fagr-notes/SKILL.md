@@ -133,8 +133,8 @@ git push origin main
 🔗 https://johanliebert66.github.io/quran-fagr/verses/NNN-اسم-السورة/#رقم-الآية
 
 ---
-🌐 تصفح كافة فوائد وملاحظات الختمة المجمعة:
-https://johanliebert66.github.io/quran-fagr/khatmas/
+🌐 تصفح أسئلة الجلسة وسجل التساؤلات المجمعة:
+https://johanliebert66.github.io/quran-fagr/fajr/سجل-الأسئلة/#جلسة-YYYY-MM-DD
 `
 
 ---
