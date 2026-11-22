@@ -11,6 +11,7 @@
 [📋 **سجل الأسئلة والأجوبة (بالأحدث)**](fajr/سجل-الأسئلة.md){ .md-button }
 [📖 **تدبر الآيات**](verses/index.md){ .md-button }
 [🌅 **مشاركات حلقة الفجر**](fajr/index.md){ .md-button }
+[🤲 **أدعية ختم القرآن**](fajr/أدعية-ختم-القرآن.md){ .md-button }
 [✨ **ما استُجدّ (الجديد)**](whats-new.md){ .md-button }
 </div>
 
