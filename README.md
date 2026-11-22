@@ -81,23 +81,26 @@ quran-fagr/
     └── khatmas/           ← per-khatmah pages (registry in khatmas/index.md)
 ```
 
-### Site navigation (left sidebar)
+### Site navigation (tabs & sidebar)
 
 ```
-الرئيسية
-تدبر السور                     ← main section (generated)
-  ├─ 001 — سورة الفاتحة          ← subsection per surah
-  ├─ … (114 surahs)
-  ├─ تجميع: ملاحظات بلاغية
-  └─ تجميع: ملاحظات نحوية ولغوية
-تدبر السور ٢                   ← parallel analysis, different model/structure (114 surahs)
-تدبر الآيات                    ← per-verse notes, classified by #تدبر / #سؤال
-مشاركات حلقة الفجر              ← main section (your manual notes)
-  ├─ فوائد لغوية                 ← subsection per category
+الرئيسية                       ← بوابة تفاعلية سريعة (لوحة تحكم + محدد فوري للسور)
+تدبر الآيات                    ← مدارسة الآيات بالتسلسل المصحفي (#تدبر / #سؤال)
+مشاركات حلقة الفجر             ← حصاد المدارسة اليومية
+  ├─ سجل أسئلة الجلسات        ← موثق بالأحدث مع روابط الآيات
+  ├─ أسئلة وأجوبة (الكامل)
+  ├─ مختصر الأسئلة والأجوبة
+  ├─ فوائد لغوية
   ├─ فوائد بلاغية
+  ├─ فوائد فقهية
+  ├─ قواعد وتنبيهات عامة
   ├─ تجويد
-  ├─ أسئلة وأجوبة
-  └─ فوائد فقهية   (add more anytime — new categories appear automatically)
+  └─ أدعية ختم القرآن
+ختمات                          ← سجل الختمات (الختمة الجارية في الصدارة)
+الجديد                         ← ما استُجدّ من مدارسات وملاحظات
+فهرس حسب السورة                ← فهرس شامل يربط السور بصفحات تدبر الآيات
+الوسوم                         ← فهرس الوسوم الموضوعية
+المنهج والمصادر                ← المرجعية العلمية المعتمدة
 ```
 
 ## Setup (one time, conda)

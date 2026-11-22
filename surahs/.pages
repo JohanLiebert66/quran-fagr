@@ -1,11 +1,9 @@
 nav:
   - الرئيسية: index.md
+  - تدبر الآيات: verses
+  - مشاركات حلقة الفجر: fajr
+  - ختمات: khatmas
   - الجديد: whats-new.md
-  - verses
-  - khatmas
-  - quran
-  - quran2
-  - fajr
   - فهرس حسب السورة: notes-by-surah.md
   - الوسوم: tags.md
   - المنهج والمصادر: المنهج-والمصادر.md

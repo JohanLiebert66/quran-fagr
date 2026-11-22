@@ -279,3 +279,91 @@ body.reading-mode .md-main__inner { margin-top: 0; }
 body.reading-mode .md-content { max-width: 46rem; margin: 0 auto; }
 body.reading-mode .md-typeset { font-size: 1.28rem; line-height: 2.15; }
 body.reading-mode .md-typeset blockquote { font-size: 1.45rem; }
+
+/* ---------- الصفحة الرئيسية: أزرار وفهرس السور السريع ---------- */
+.quick-action-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 1.2em 0 1.8em 0;
+}
+.quick-action-bar .md-button {
+  margin: 0;
+  font-family: "Cairo", sans-serif;
+  font-weight: 600;
+  border-radius: 8px;
+  font-size: 0.95rem;
+}
+
+.surah-picker-box {
+  background: var(--md-code-bg-color);
+  border: 2px solid var(--md-primary-fg-color);
+  border-radius: 10px;
+  padding: 1.2em 1.5em;
+  margin: 1.5em 0 2em 0;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+}
+.surah-picker-title {
+  font-family: "Cairo", sans-serif;
+  font-weight: 700;
+  font-size: 1.15rem;
+  color: var(--md-primary-fg-color);
+  margin-bottom: 0.8em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.surah-picker-controls {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.surah-dropdown {
+  flex: 1;
+  min-width: 250px;
+  padding: 10px 14px;
+  font-size: 1.05rem;
+  font-family: "Cairo", "Noto Naskh Arabic", sans-serif;
+  border: 1.5px solid var(--md-default-fg-color--lightest);
+  border-radius: 8px;
+  background-color: var(--md-default-bg-color);
+  color: var(--md-default-fg-color);
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.surah-dropdown:focus {
+  outline: none;
+  border-color: var(--md-primary-fg-color);
+  box-shadow: 0 0 0 3px rgba(0, 150, 136, 0.2);
+}
+
+.surah-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 8px;
+  margin: 1.2em 0;
+}
+.surah-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 7px 10px;
+  border-radius: 8px;
+  background: rgba(0, 150, 136, 0.07);
+  color: var(--md-default-fg-color) !important;
+  border: 1px solid rgba(0, 150, 136, 0.2);
+  font-family: "Cairo", sans-serif;
+  font-size: 0.92rem;
+  font-weight: 600;
+  text-decoration: none !important;
+  transition: all 0.18s ease-in-out;
+}
+.surah-chip:hover {
+  background: var(--md-primary-fg-color);
+  color: #fff !important;
+  border-color: var(--md-primary-fg-color);
+  transform: translateY(-2px);
+  box-shadow: 0 3px 8px rgba(0, 150, 136, 0.3);
+}
+

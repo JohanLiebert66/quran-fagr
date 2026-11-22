@@ -134,7 +134,7 @@ def main() -> None:
         "# فهرس الملاحظات حسب السورة\n",
         "تجميعٌ تلقائي: لكل سورة وردت في **مشاركات حلقة الفجر** أو في **تدبر الآيات**، "
         "قائمة الملاحظات التي تخصّها مع روابط مباشرة لكل آية وفائدة.\n",
-        "للإضافة: اكتب رابطًا مثل `[البقرة:255](../quran/002-البقرة.md)` في ملاحظة فجر، "
+        "للإضافة: اكتب رابطًا مثل `[البقرة:255](../verses/002-البقرة.md)` في ملاحظة فجر، "
         "أو أنشئ/حدّث ملف `surahs/verses/NNN-name.md` وأضف عنوان `## آية N: ...`.\n",
     ]
 
@@ -144,7 +144,7 @@ def main() -> None:
         for key in sorted_keys:
             num = key.split("-", 1)[0].lstrip("0") or "0"
             name = key.split("-", 1)[1].replace("-", " ")
-            lines.append(f"\n## [{num} — سورة {name}](quran/{key}.md)\n")
+            lines.append(f"\n## [{num} — سورة {name}](verses/{key}.md)\n")
             for src_rel, title, label, ref in by_surah[key]:
                 ref_part = f" (المرجع: **{ref}**)" if ref else ""
                 lines.append(f"- [{title}]({src_rel}) — *{label}*{ref_part}")
